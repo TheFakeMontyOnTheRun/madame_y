@@ -1,0 +1,1 @@
+void playSound( int sound );
