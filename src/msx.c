@@ -14,7 +14,7 @@ uint8_t getch();
 surface_t surface;
 unsigned char* sbuffer;
 
-void fix_line (int16_t x0, int16_t y0, int16_t x1, int16_t y1) {
+void fix_line (int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
   surface_draw(&surface, x0, y0, x1, y1 );
 }
 
@@ -25,7 +25,7 @@ void shutdown() {
 }
 
 void graphicsPut( int x, int y ) {
-  fix_line( x, y, x, y);
+  fix_line( x, y, x, y, 1);
 }
 
 void clear() {
