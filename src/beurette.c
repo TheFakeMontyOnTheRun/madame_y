@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string.h>
+#include "FixP.h"
+
 
 void shutdown();
 
@@ -304,4 +307,6 @@ int main(int argc, char **argv) {
 	} while (running);
 
 	shutdown();
+
+	return 0;
 }
