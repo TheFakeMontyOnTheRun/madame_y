@@ -22,6 +22,9 @@ void graphicsFlush();
 
 void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour);
 
+uint8_t stencilHigh[256];
+uint8_t stencilLow[256];
+
 struct Projection {
 	uint8_t px;
 	uint8_t py;
@@ -34,14 +37,6 @@ struct Pattern {
 	int16_t ceiling;
 	int16_t floor;
 };
-
-const struct Pattern patterns[16] = {
-		{-1, 255},
-		{0,  255},
-		{2,  2},
-		{-1, 2}
-};
-
 
 const struct Projection projections[41] =
 		{
@@ -89,11 +84,19 @@ const struct Projection projections[41] =
 				{124, 66,  -28,   16}, // 40
 		};
 
+const struct Pattern patterns[16] = {
+		{3, -1}, //0
+		{2, 0}, // 1
+		{2, 1}, // 2
+		{2, -1}, //3
+		{3, -1} //4
+};
+
 const int8_t map[40][40] = {
+		{0, 0, 0, 4, 3, 2, 2, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 4, 4, 1, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -159,7 +162,7 @@ void drawQuad(int16_t x, int16_t y, int16_t x1, int16_t y1, int16_t colour) {
 }
 
 
-void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ) {
+void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ, int low) {
 
 	int8_t z1;
 	uint8_t z0px;
@@ -206,7 +209,155 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 	drawQuad(px0z1, py0z1, px1z1, py1z1, 5);
 	drawQuad(px0z0, py0z0, px1z0, py1z0, 5);
 
-	graphicsFill(px0z0, py0z0, px1z0, py1z0, 5);
+	if (!low) {
+
+		FixP_t heightDiff;
+		FixP_t fy;
+		FixP_t fDeltatY;
+		int x, x0, x1;
+
+		for (x = px0z0; x < px1z0; ++x) {
+			if (stencilHigh[x] < py0z0) {
+				stencilHigh[x] = py0z0;
+			}
+		}
+
+		for (x = px0z1; x < px1z1; ++x) {
+			if (stencilHigh[x] < py0z1) {
+				stencilHigh[x] = py0z1;
+			}
+		}
+
+		x0 = px0z0;
+		x1 = px0z1;
+
+		if ( x0 != x1 ) {
+
+			if (x0 > x1) {
+				x0 = x0 + x1;
+				x1 = x0 - x1;
+				x0 = x0 - x1;
+				fy = intToFix(py0z1);
+				heightDiff = (py0z0 - py0z1);
+			} else {
+				fy = intToFix(py0z0);
+				heightDiff = (py0z1 - py0z0);
+			}
+
+			fDeltatY = Div(intToFix(heightDiff), intToFix(x1 - x0));
+
+			for (x = x0; x < x1; ++x) {
+
+				int iy = fixToInt(fy);
+				fy += fDeltatY;
+				if (stencilHigh[x] < iy) {
+					stencilHigh[x] = iy;
+				}
+			}
+		}
+
+		x0 = px1z0;
+		x1 = px1z1;
+
+		if ( x0 != x1 ) {
+
+			if (x0 > x1) {
+				x0 = x0 + x1;
+				x1 = x0 - x1;
+				x0 = x0 - x1;
+				fy = intToFix(py0z1);
+				heightDiff = (py0z0 - py0z1);
+			} else {
+				fy = intToFix(py0z0);
+				heightDiff = (py0z1 - py0z0);
+			}
+
+			fDeltatY = Div(intToFix(heightDiff), intToFix(x1 - x0));
+
+			for (x = x0; x < x1; ++x) {
+
+				int iy = fixToInt(fy);
+				fy += fDeltatY;
+				if (stencilHigh[x] < iy) {
+					stencilHigh[x] = iy;
+				}
+			}
+		}
+	} else {
+		FixP_t heightDiff;
+		FixP_t fy;
+		FixP_t fDeltatY;
+		int x, x0, x1;
+
+		for (x = px0z0; x < px1z0; ++x) {
+			if (stencilLow[x] > py1z0) {
+				stencilLow[x] = py1z0;
+			}
+		}
+
+		for (x = px0z1; x < px1z1; ++x) {
+			if (stencilLow[x] > py1z1) {
+				stencilLow[x] = py1z1;
+			}
+		}
+
+		x0 = px0z0;
+		x1 = px0z1;
+
+		if ( x0 != x1 ) {
+
+			if (x0 > x1) {
+				x0 = x0 + x1;
+				x1 = x0 - x1;
+				x0 = x0 - x1;
+				fy = intToFix(py1z1);
+				heightDiff = (py1z0 - py1z1);
+			} else {
+				fy = intToFix(py1z0);
+				heightDiff = (py1z1 - py1z0);
+			}
+
+			fDeltatY = Div(intToFix(heightDiff), intToFix(x1 - x0));
+
+			for (x = x0; x < x1; ++x) {
+
+				int iy = fixToInt(fy);
+				fy += fDeltatY;
+				if (stencilLow[x] > iy) {
+					stencilLow[x] = iy;
+				}
+			}
+		}
+
+		x0 = px1z0;
+		x1 = px1z1;
+
+		if ( x0 != x1 ) {
+
+			if (x0 > x1) {
+				x0 = x0 + x1;
+				x1 = x0 - x1;
+				x0 = x0 - x1;
+				fy = intToFix(py1z1);
+				heightDiff = (py1z0 - py1z1);
+			} else {
+				fy = intToFix(py1z0);
+				heightDiff = (py1z1 - py1z0);
+			}
+
+			fDeltatY = Div(intToFix(heightDiff), intToFix(x1 - x0));
+
+			for (x = x0; x < x1; ++x) {
+
+				int iy = fixToInt(fy);
+				fy += fDeltatY;
+				if (stencilLow[x] > iy) {
+					stencilLow[x] = iy;
+				}
+			}
+		}
+	}
+
 
 	fix_line(px0z0, py0z0, px0z1, py0z1, 5);
 	fix_line(px1z0, py0z0, px1z1, py0z1, 5);
@@ -268,29 +419,42 @@ int main(int argc, char **argv) {
 		}
 
 		clear();
+		memset(stencilLow, 0xFF, 256);
+		memset(stencilHigh, 0, 256);
 
-
-		fix_line(0, 64, 255, 64, 1);
 
 		for (int y = max(cameraZ - 40, 0); y < min(cameraZ, 40); ++y) {
 			for (int x = max(cameraX - 10, 0); x < min(cameraX + 10, 40); ++x) {
 				int pattern = map[y][x];
 
-
-				if (patterns[pattern].floor != patterns[0].floor) {
-					drawCubeAt(x - cameraX, patterns[pattern].floor, cameraZ - y, 1,
-							   patterns[pattern].floor - patterns[0].floor, 1);
-				}
-
-				if (patterns[pattern].ceiling != patterns[0].ceiling) {
-					drawCubeAt(x - cameraX, patterns[pattern].ceiling, cameraZ - y, 1,
-							   patterns[0].ceiling - patterns[pattern].ceiling, 1);
-				}
-
 				if (pattern != 0) {
+					int diff;
+
+					diff = patterns[pattern].floor - patterns[0].floor;
+					//if (diff)
+					{
+						drawCubeAt(x - cameraX, patterns[0].floor, cameraZ - y, 1,
+								   diff, 1, 1);
+					}
+
+					diff = patterns[0].ceiling - patterns[pattern].ceiling;
+					//if (diff)
+					{
+						drawCubeAt(x - cameraX, patterns[pattern].ceiling, cameraZ - y, 1,
+								   diff, 1, 0);
+					}
+
 					graphicsPut(x, y, pattern % 15);
 				}
 			}
+		}
+
+		for (int z = 0; z < 256; ++z) {
+			int high = stencilHigh[z];
+			int low = stencilLow[z];/*
+			fix_line(z, max(0, high), z, min( 64, high), 3);
+			fix_line(z, min(128, low), z, max( 64, low), 4);*/
+			fix_line(z, high, z, low, 3 );
 		}
 
 
