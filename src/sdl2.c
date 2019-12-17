@@ -18,16 +18,20 @@ uint8_t framebuffer[160 * 200];
 
 
 void graphicsPut(int x, int y, int colour) {
+
+	x = x / 2;
+
 	if (x < 0 || x > 160 || y < 0 || y > 200) {
 		return;
 	}
+
+
+
 	framebuffer[(160 * y) + x] = colour;
 }
 
 
 void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
-	x0 = x0 / 2;
-	x1 = x1 / 2;
 
 	if (x0 == x1) {
 
@@ -41,7 +45,7 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
 
 
 		for (int16_t y = _y0; y <= _y1; ++y) {
-			if (x0 < 0 || x0 >= 128 || y < 0 || y >= 128) {
+			if (x0 < 0 || x0 >= 256 || y < 0 || y >= 128) {
 				continue;
 			}
 
@@ -60,7 +64,7 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
 		}
 
 		for (int16_t x = _x0; x <= _x1; ++x) {
-			if (x < 0 || x >= 128 || y0 < 0 || y0 >= 128) {
+			if (x < 0 || x >= 256 || y0 < 0 || y0 >= 128) {
 				continue;
 			}
 
@@ -80,18 +84,20 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
 		y0 = y0 - y1;
 	}
 
-	FixP_t fy = intToFix(y0);
-	FixP_t fDeltatY = Div(intToFix(y1 - y0), intToFix(x1 - x0));
+	{
+		FixP_t fy = intToFix(y0);
+		FixP_t fDeltatY = Div(intToFix(y1 - y0), intToFix(x1 - x0));
 
-	for (int16_t x = x0; x <= x1; ++x) {
-		int iy = fixToInt(fy);
-		fy += fDeltatY;
+		for (int16_t x = x0; x <= x1; ++x) {
+			int iy = fixToInt(fy);
+			fy += fDeltatY;
 
-		if (x < 0 || x >= 128 || iy < 0 || iy >= 128) {
-			continue;
+			if (x < 0 || x >= 256 || iy < 0 || iy >= 128) {
+				continue;
+			}
+			graphicsPut(x, iy, colour);
+
 		}
-		graphicsPut(x, iy, colour);
-
 	}
 }
 
