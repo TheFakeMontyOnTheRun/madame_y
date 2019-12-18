@@ -24,7 +24,15 @@ void shutdown() {
   set_mode(mode_0);
 }
 
-void graphicsPut( int x, int y ) {
+void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
+	fix_line(x0, y, x1, y, colour );
+}
+
+void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
+	fix_line(x0, y0, x0, y1, colour );
+}
+
+void graphicsPut( int x, int y, uint8_t colour ) {
   fix_line( x, y, x, y, 1);
 }
 

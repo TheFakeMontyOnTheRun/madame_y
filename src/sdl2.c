@@ -101,6 +101,15 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
 	}
 }
 
+void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
+	fix_line(x0, y, x1, y, colour );
+}
+
+void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
+	fix_line(x0, y0, x0, y1, colour );
+}
+
+
 void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
 
 }
@@ -229,12 +238,21 @@ void flipRenderer() {
 			rect.y = (24 * y) / 10;
 			rect.w = 4;
 			rect.h = 3;
+			int index = framebuffer[(160 * y) + x];
 
-			pixel = palette[framebuffer[(160 * y) + x]];
+			if (index < 0 || index >= 16 ) {
+				continue;
+			}
 
-			SDL_SetRenderDrawColor(renderer, (pixel & 0x00FF0000) >> 16,
-								   ((pixel & 0x0000FF00) >> 8),
-								   ((pixel & 0x000000FF)), 255);
+			pixel = palette[index];
+
+			int r = (pixel & 0x00FF0000) >> 16;
+			int g = ((pixel & 0x0000FF00) >> 8);
+			int b = ((pixel & 0x000000FF));
+
+			SDL_SetRenderDrawColor(renderer, r,
+								   g,
+								   b, 255);
 			SDL_RenderFillRect(renderer, &rect);
 		}
 	}

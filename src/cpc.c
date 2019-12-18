@@ -10,6 +10,8 @@
 #define SCR_4000 (u8*)0x4000
 #define SCR_C000 (u8*)0xC000
 
+#define USE_FIXP_FOR_LINES
+
 u8 page;
 
 void shutdown() {
@@ -18,8 +20,6 @@ void shutdown() {
 
 void clear() {
 	cpct_memset_f64(SCR_C000, 0x0000, 16384);
-
-
 }
 
 void graphicsPut(int nColumn, int nLine, uint8_t nColor);
@@ -191,7 +191,7 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 
 	for(nColumn = x0; nColumn < x1; nColumn++)
 	{
-		if ( nColumn < 0 || nColumn >= 160 ) {
+		if ( nColumn < 0 || nColumn >= 128 ) {
 			continue;
 		}
 
@@ -208,6 +208,53 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 	}
 }
 
+void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
+	unsigned char *pScreen = (unsigned char *)0xC000;
+	unsigned char * addr = GetLineAddress(y);
+	int16_t nLine = 0;
+	int16_t nColumn = 0;
+	int16_t nPixel = 0;
+
+	x0 = x0 / 2;
+	x1 = x1 / 2;
+
+	for(nColumn = x0; nColumn < x1; nColumn++)
+	{
+		if ( nColumn < 0 || nColumn >= 128 ) {
+			continue;
+		}
+
+		nPixel = nColumn & 1;
+
+		pScreen = addr + (nColumn >> 1);
+		SetMode0PixelColor(pScreen, colour, nPixel);
+	}
+}
+
+void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
+	unsigned char *pScreen = (unsigned char *) 0xC000;
+	int16_t nLine = 0;
+	int16_t nColumn = 0;
+	int16_t nPixel = 0;
+
+	x0 = x0 / 2;
+
+	nColumn = x0;
+
+	if (nColumn < 0 || nColumn >= 128) {
+		return;
+	}
+
+	nPixel = nColumn & 1;
+
+	for (nLine = y0; nLine < y1; nLine++) {
+		if (nLine < 0 || nLine >= 128) {
+			return;
+		}
+		pScreen = GetLineAddress(nLine) + (nColumn >> 1);
+		SetMode0PixelColor(pScreen, colour, nPixel);
+	}
+}
 
 void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
 #ifdef USE_FIXP_FOR_LINES
@@ -216,7 +263,7 @@ void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
 
 	nColumn = nColumn / 2;
 
-	if (nColumn < 0 || nColumn >= 160 || nLine < 0 || nLine >= 200 ) {
+	if (nColumn < 0 || nColumn >= 128 || nLine < 0 || nLine >= 200 ) {
 		return;
 	}
 
