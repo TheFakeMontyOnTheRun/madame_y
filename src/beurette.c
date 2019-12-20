@@ -6,7 +6,7 @@
 #include "FixP.h"
 
 #ifndef MSX
-#define FILLED_POLYS
+//#define FILLED_POLYS
 #endif
 
 void shutdown();
@@ -23,8 +23,10 @@ void init();
 
 void graphicsFlush();
 
-void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour);
+//void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour);
+
 void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour);
+
 void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour);
 
 uint8_t stencilHigh[256];
@@ -92,18 +94,18 @@ const struct Projection projections[41] =
 
 const struct Pattern patterns[16] = {
 		{3, -1, 0}, //0
-		{2, 0, 0}, // 1
-		{2, 1, 1}, // 2
+		{2, 0,  0}, // 1
+		{2, 1,  1}, // 2
 		{2, -1, 0}, //3
 		{3, -1, 0} //4
 };
 
 const int8_t map[40][40] = {
-		{4, 4, 4, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 2, 4, 1, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 2, 4, 1, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 4, 4, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 4, 4, 4, 2, 4, 1, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 4, 4, 4, 2, 4, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
 		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
 		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
 		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
@@ -169,6 +171,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 	int16_t py0z1;
 	int16_t px1z1;
 	int16_t py1z1;
+	int drawContour = 1;
 
 	z1 = z0 + dZ;
 	z0px = (projections[z0].px);
@@ -189,6 +192,30 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 	py0z1 = z1py - ((y0) * z1dy);
 	px1z1 = px0z1 - (dX * z1dx);
 	py1z1 = py0z1 - (dY * z1dy);
+
+	if (py0z0 == py1z0 ) {
+		drawContour = 0;
+	}
+
+/*
+ * //DEBUG
+	fix_line( px0z0, py0z0, px1z0, py0z0, 5);
+	fix_line( px0z0, py0z0, px0z0, py1z0, 5);
+	fix_line( px1z0, py0z0, px1z0, py1z0, 5);
+	fix_line( px0z0, py1z0, px1z0, py1z0, 5);
+
+	fix_line( px0z1, py0z1, px1z1, py0z1, 5);
+	fix_line( px0z1, py0z1, px0z1, py1z1, 5);
+	fix_line( px1z1, py0z1, px1z1, py1z1, 5);
+	fix_line( px0z1, py1z1, px1z1, py1z1, 5);
+
+	fix_line( px0z0, py0z0, px0z1, py0z1, 5);
+	fix_line( px1z0, py0z0, px1z1, py0z1, 5);
+	fix_line( px0z0, py1z0, px0z1, py1z1, 5);
+	fix_line( px1z0, py1z0, px1z1, py1z1, 5);
+return;
+ */
+
 
 	if (!low) {
 
@@ -220,7 +247,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 		x0 = px0z0;
 		x1 = px0z1;
 
-		if ( x0 != x1 ) {
+		if (x0 != x1) {
 
 			if (x0 > x1) {
 				x0 = x0 + x1;
@@ -252,7 +279,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 		x0 = px1z0;
 		x1 = px1z1;
 
-		if ( x0 != x1 ) {
+		if (x0 != x1) {
 
 			if (x0 > x1) {
 				x0 = x0 + x1;
@@ -280,36 +307,66 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 				}
 			}
 		}
-	} else { /* LOW area */
+
+
+	} else { /* ------------ LOW area ------------ */
+
+
+
 		FixP_t heightDiff;
 		FixP_t fy;
 		FixP_t fDeltatY;
 		int x, x0, x1;
 
-		for (x = px0z0; x < px1z0; ++x) {
-			if (stencilLow[x] > py1z0) {
-#ifdef FILLED_POLYS
-				fix_line(x, py1z0 + 1, x, stencilLow[x] - 1, colour);
-#endif
-				graphicsPut(x, py1z0, 5);
-				stencilLow[x] = py1z0;
+		if (drawContour ) {
+			if (stencilLow[px0z0] > py1z0) {
+				vLine(px0z0, py1z0, stencilLow[px0z0] - 1, 9);
+			}
+
+			if (stencilLow[px1z0] > py1z0) {
+				vLine(px1z0, py1z0, stencilLow[px1z0] - 1, 10);
+			}
+
+			if (px0z1 < px0z0 && py1z1 < stencilLow[px0z1]) {
+				vLine(px0z1, py1z1, stencilLow[px0z1] - 1, 11);
+			}
+
+			if (px1z1 > px1z0 && py1z1 < stencilLow[px1z1]) {
+				vLine(px1z1, py1z1, stencilLow[px1z1] - 1, 12);
 			}
 		}
 
-		for (x = px0z1; x < px1z1; ++x) {
-			if (stencilLow[x] > py1z1) {
+		if (py1z0 > py1z1) {
+			for (x = px0z1; x < px1z1; ++x) {
+				if (stencilLow[x] > py1z1) {
+					if (drawContour) {
 #ifdef FILLED_POLYS
-				fix_line(x, py1z1 + 1, x, stencilLow[x] - 1, colour);
+						fix_line(x, py1z1 + 1, x, stencilLow[x] - 1, colour);
 #endif
-				graphicsPut(x, py1z1, 5);
-				stencilLow[x] = py1z1;
+						graphicsPut(x, py1z1, 5);
+					}
+
+					stencilLow[x] = py1z1;
+				}
+			}
+		} else {
+			for (x = px0z0; x < px1z0; ++x) {
+				if (stencilLow[x] > py1z0) {
+					if (drawContour) {
+#ifdef FILLED_POLYS
+						fix_line(x, py1z0 + 1, x, stencilLow[x] - 1, colour);
+#endif
+						graphicsPut(x, py1z0, 6);
+					}
+					stencilLow[x] = py1z0;
+				}
 			}
 		}
 
 		x0 = px0z0;
 		x1 = px0z1;
 
-		if ( x0 != x1 ) {
+		if (drawContour && x0 != x1) {
 
 			if (x0 > x1) {
 				x0 = x0 + x1;
@@ -341,7 +398,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 		x0 = px1z0;
 		x1 = px1z1;
 
-		if ( x0 != x1 ) {
+		if (drawContour && x0 != x1) {
 
 			if (x0 > x1) {
 				x0 = x0 + x1;
@@ -372,24 +429,24 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 	}
 }
 
-void drawPattern( int pattern, int x, int y, int cameraX, int cameraZ ) {
+void drawPattern(int pattern, int x0, int x1, int y, int cameraX, int cameraZ) {
 
-		int diff;
+	int diff;
 
-		diff = patterns[pattern].floor - patterns[0].floor;
-		//if (diff)
-		{
-			drawCubeAt(x - cameraX, patterns[0].floor, cameraZ - y, 1,
-					   diff, 1, 1, pattern );
-		}
+	diff = patterns[pattern].floor - patterns[0].floor;
+	//if (diff)
+	{
+		drawCubeAt(x0 - cameraX, patterns[0].floor, cameraZ - y, x1 - x0,
+				   diff, 1, 1, pattern);
+	}
 
-		diff = patterns[0].ceiling - patterns[pattern].ceiling;
-		//if (diff)
-		{
-			drawCubeAt(x - cameraX, patterns[pattern].ceiling, cameraZ - y, 1,
-					   diff, 1, 0, pattern );
-		}
-
+	diff = patterns[0].ceiling - patterns[pattern].ceiling;
+	//if (diff)
+	/*
+	{
+		drawCubeAt(x - cameraX, patterns[pattern].ceiling, cameraZ - y, 1,
+				   diff, 1, 0, pattern);
+	}*/
 }
 
 int main(int argc, char **argv) {
@@ -397,8 +454,12 @@ int main(int argc, char **argv) {
 	int8_t x, y = 0;
 	int8_t cameraX = 4;
 	int8_t cameraZ = 12;
+	int lastPattern, lastIndex;
 
 	init();
+	memset(stencilLow, 0xFF, 256);
+	memset(stencilHigh, 0, 256);
+
 
 	do {
 
@@ -443,36 +504,62 @@ int main(int argc, char **argv) {
 		}
 
 		clear();
-		memset(stencilLow, 0xFF, 256);
-		memset(stencilHigh, 0, 256);
+
+		vLine(255, 0, 127, 2);
+		vLine(0, 0, 127, 2);
+
+		hLine(0, 255, 0, 2);
+		hLine(0, fixToInt( Div( intToFix(64), intToFix(2)) ), 127, 2);
+
 
 
 		for (int y = min(cameraZ - 3, 40); y >= max(cameraZ - 40, 0); --y) {
-			for (int x = cameraX; x < min(cameraX + 4 + ( (cameraZ - 3) - y), 40); ++x) {
+			int x;
+			lastIndex = cameraX;
+			lastPattern = map[y][lastIndex];
+
+			for (x = lastIndex; x < min(cameraX + 4 + ((cameraZ - 3) - y), 40); ++x) {
 				int pattern = map[y][x];
-				if (pattern != 0) {
-					drawPattern( pattern, x, y, cameraX, cameraZ);
+
+				if (pattern != lastPattern ) {
+					if (lastPattern != 0) {
+						drawPattern(lastPattern, lastIndex, x, y, cameraX, cameraZ);
+						lastIndex = x;
+						lastPattern = pattern;
+					}
 				}
 			}
+			if (lastPattern != 0) {
+				drawPattern(lastPattern, lastIndex, x, y, cameraX, cameraZ);
+			}
 
-			for ( x = max(cameraX - 1, 0); x >= max(cameraX - 2 - ( (cameraZ - 3) - y), 0) ; --x) {
+			lastIndex = max(cameraX - 1, 0);
+			lastPattern = map[y][lastIndex];
+
+			for (x = lastIndex; x >= max(cameraX - 2 - ((cameraZ - 3) - y), 0); --x) {
 				int pattern = map[y][x];
-				if (pattern != 0) {
-					drawPattern( pattern, x, y, cameraX, cameraZ);
+
+				if (pattern != lastPattern ) {
+					if (lastPattern != 0) {
+						drawPattern(lastPattern, x + 1, lastIndex + 1, y, cameraX, cameraZ);
+						lastIndex = x;
+						lastPattern = pattern;
+					}
 				}
+			}
+			if (lastPattern != 0) {
+				drawPattern(lastPattern, x + 1, lastIndex + 1, y, cameraX, cameraZ);
 			}
 
 		}
 
 		graphicsPut(cameraX, cameraZ, 16);
 
-		fix_line(0, 0, 255, 0, 2);
-		fix_line(0, 127, 255, 127, 2);
-		vLine(255, 0, 127, 2);
-		vLine(0, 0, 127, 2);
-
 
 		graphicsFlush();
+		memset(stencilLow, 0xFF, 256);
+		memset(stencilHigh, 0, 256);
+
 	} while (running);
 
 	shutdown();

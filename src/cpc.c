@@ -61,11 +61,7 @@ void init() {
 }
 
 void graphicsFlush() {
-	cpct_waitVSYNC();
-}
 
-unsigned char *GetLineAddress(unsigned char nLine) {
-	return (unsigned char *) 0xC000 + ((nLine / 8) * 80) + ((nLine % 8) * 2048);
 }
 
 void SetMode0PixelColor(unsigned char *pByteAddress, unsigned char nColor, unsigned char nPixel) {
@@ -202,42 +198,27 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 			if ( nLine < 0 || nLine >= 200 ) {
 				continue;
 			}
-			pScreen = GetLineAddress(nLine) + (nColumn >> 1);
+			pScreen =  ((unsigned char *) 0xC000 + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
 			SetMode0PixelColor(pScreen, colour, nPixel);
 		}
 	}
 }
 
 void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
-	unsigned char *pScreen = (unsigned char *)0xC000;
-	unsigned char * addr = GetLineAddress(y);
-	int16_t nLine = 0;
-	int16_t nColumn = 0;
-	int16_t nPixel = 0;
-
-	x0 = x0 / 2;
-	x1 = x1 / 2;
-
-	for(nColumn = x0; nColumn < x1; nColumn++)
-	{
-		if ( nColumn < 0 || nColumn >= 128 ) {
-			continue;
-		}
-
-		nPixel = nColumn & 1;
-
-		pScreen = addr + (nColumn >> 1);
-		SetMode0PixelColor(pScreen, colour, nPixel);
-	}
+	fix_line( x0, y, x1, y, colour );
 }
 
 void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 	unsigned char *pScreen = (unsigned char *) 0xC000;
+	uint16_t base;
+	unsigned char nByte;
 	int16_t nLine = 0;
 	int16_t nColumn = 0;
 	int16_t nPixel = 0;
+	uint8_t mask1 = 0;
+	uint8_t mask2 = 0;
 
-	x0 = x0 / 2;
+	x0 = x0 >> 1;
 
 	nColumn = x0;
 
@@ -247,12 +228,49 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 
 	nPixel = nColumn & 1;
 
+	pScreen = (unsigned char *) 0xC000;
+
+	if (nPixel == 0) {
+		mask1 = 85;
+
+		if (colour & 1)
+			mask2 = 128;
+
+		if (colour & 2)
+			mask2 = 8;
+
+		if (colour & 4)
+			mask2 = 32;
+
+		if (colour & 8)
+			mask2 = 2;
+	} else {
+		mask1 = 170;
+
+		if (colour & 1)
+			mask2 = 64;
+
+		if (colour & 2)
+			mask2 = 4;
+
+		if (colour & 4)
+			mask2 = 16;
+
+		if (colour & 8)
+			mask2 = 1;
+	}
+
+	base = 0xC000 + (nColumn >> 1);
+
 	for (nLine = y0; nLine < y1; nLine++) {
 		if (nLine < 0 || nLine >= 128) {
 			return;
 		}
-		pScreen = GetLineAddress(nLine) + (nColumn >> 1);
-		SetMode0PixelColor(pScreen, colour, nPixel);
+		pScreen =  ((unsigned char *) base + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) ;
+		nByte = *pScreen;
+		nByte &= mask1;
+		nByte |= mask2;
+		*pScreen = nByte;
 	}
 }
 
@@ -260,17 +278,49 @@ void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
 #ifdef USE_FIXP_FOR_LINES
 	unsigned char *pScreen = (unsigned char *) 0xC000;
 	unsigned char nPixel = 0;
-
-	nColumn = nColumn / 2;
+	unsigned char nByte;
+	nColumn = nColumn >> 1;
 
 	if (nColumn < 0 || nColumn >= 128 || nLine < 0 || nLine >= 200 ) {
 		return;
 	}
 
-	nPixel = nColumn % 2;
+	nPixel = nColumn & 1;
 
-	pScreen = GetLineAddress(nLine) + nColumn / 2;
-	SetMode0PixelColor(pScreen, nColor, nPixel);
+	pScreen =  ((unsigned char *) 0xC000 + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
+	nByte = *pScreen;
+
+	if (nPixel == 0) {
+		nByte &= 85;
+
+		if (nColor & 1)
+			nByte |= 128;
+
+		if (nColor & 2)
+			nByte |= 8;
+
+		if (nColor & 4)
+			nByte |= 32;
+
+		if (nColor & 8)
+			nByte |= 2;
+	} else {
+		nByte &= 170;
+
+		if (nColor & 1)
+			nByte |= 64;
+
+		if (nColor & 2)
+			nByte |= 4;
+
+		if (nColor & 4)
+			nByte |= 16;
+
+		if (nColor & 8)
+			nByte |= 1;
+	}
+
+	*pScreen = nByte;
 #else
 	fix_line(nColumn, nLine, nColumn, nLine, nColor);
 #endif

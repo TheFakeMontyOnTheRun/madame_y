@@ -15,7 +15,7 @@ SDL_Renderer *renderer;
 uint8_t mBufferedCommand;
 uint32_t palette[16];
 uint8_t framebuffer[160 * 200];
-
+void graphicsFlush();
 
 void graphicsPut(int x, int y, int colour) {
 
@@ -28,6 +28,10 @@ void graphicsPut(int x, int y, int colour) {
 
 
 	framebuffer[(160 * y) + x] = colour;
+#ifdef PUTAFLIP
+	graphicsFlush();
+	SDL_Delay(100);
+#endif
 }
 
 
