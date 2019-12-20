@@ -93,24 +93,25 @@ const struct Projection projections[41] =
 		};
 
 const struct Pattern patterns[16] = {
-		{3, -1, 0}, //0
+		{5, -1, 0}, //0
 		{2, 0,  0}, // 1
-		{2, 1,  1}, // 2
+		{-1, -1,  1}, // 2
 		{2, -1, 0}, //3
-		{3, -1, 0} //4
+		{5, -1, 0}, //4
+		{3, 2, 0} //5
 };
 
 const int8_t map[40][40] = {
-		{4, 4, 4, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 2, 4, 1, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 2, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 2, 4, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 4, 4, 4, 4, 4, 4, 4, 2, 4, 2, 2, 2, 2, 2, 4, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 4, 4, 4, 2, 4, 2, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 2, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		{4, 2, 2, 3, 3, 3, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
 		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
 		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
 		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
@@ -197,53 +198,72 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 		drawContour = 0;
 	}
 
-/*
- * //DEBUG
-	fix_line( px0z0, py0z0, px1z0, py0z0, 5);
-	fix_line( px0z0, py0z0, px0z0, py1z0, 5);
-	fix_line( px1z0, py0z0, px1z0, py1z0, 5);
-	fix_line( px0z0, py1z0, px1z0, py1z0, 5);
+#ifdef DEBUG_WIREFRAME
+	fix_line( px0z0, py0z0, px1z0, py0z0, 4);
+	fix_line( px0z0, py0z0, px0z0, py1z0, 4);
+	fix_line( px1z0, py0z0, px1z0, py1z0, 4);
+	fix_line( px0z0, py1z0, px1z0, py1z0, 4);
 
-	fix_line( px0z1, py0z1, px1z1, py0z1, 5);
-	fix_line( px0z1, py0z1, px0z1, py1z1, 5);
-	fix_line( px1z1, py0z1, px1z1, py1z1, 5);
-	fix_line( px0z1, py1z1, px1z1, py1z1, 5);
+	fix_line( px0z1, py0z1, px1z1, py0z1, 4);
+	fix_line( px0z1, py0z1, px0z1, py1z1, 4);
+	fix_line( px1z1, py0z1, px1z1, py1z1, 4);
+	fix_line( px0z1, py1z1, px1z1, py1z1, 4);
 
-	fix_line( px0z0, py0z0, px0z1, py0z1, 5);
-	fix_line( px1z0, py0z0, px1z1, py0z1, 5);
-	fix_line( px0z0, py1z0, px0z1, py1z1, 5);
-	fix_line( px1z0, py1z0, px1z1, py1z1, 5);
-return;
- */
-
+	fix_line( px0z0, py0z0, px0z1, py0z1, 4);
+	fix_line( px1z0, py0z0, px1z1, py0z1, 4);
+	fix_line( px0z0, py1z0, px0z1, py1z1, 4);
+	fix_line( px1z0, py1z0, px1z1, py1z1, 4);
+#endif
 
 	if (!low) {
-
 		FixP_t heightDiff;
 		FixP_t fy;
 		FixP_t fDeltatY;
 		int x, x0, x1;
 
-		for (x = px0z0; x < px1z0; ++x) {
-			if (stencilHigh[x] < py0z0) {
-#ifdef FILLED_POLYS
-				fix_line(x, py0z0 + 1, x, stencilHigh[x] - 1, colour);
-#endif
-				graphicsPut(x, py0z0, 5);
-				stencilHigh[x] = py0z0;
+		if (drawContour ) {
+			if (stencilHigh[px0z0] < py0z0) {
+				vLine(px0z0, py0z0, stencilHigh[px0z0] + 1, 5);
+			}
+
+			if (stencilHigh[px1z0] < py0z0) {
+				vLine(px1z0, py0z0, stencilHigh[px1z0] + 1, 5);
+			}
+
+			if (px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
+				vLine(px0z1, py0z1, stencilHigh[px0z1] + 1, 5);
+			}
+
+			if (px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
+				vLine(px1z1, py0z1, stencilHigh[px1z1] + 1, 5);
 			}
 		}
 
-		for (x = px0z1; x < px1z1; ++x) {
-			if (stencilHigh[x] < py0z1) {
+		if (py0z0 > py0z1) {
+			for (x = px0z0; x < px1z0; ++x) {
+				if (stencilHigh[x] < py0z0) {
 #ifdef FILLED_POLYS
-				fix_line(x, py0z1 + 1, x, stencilHigh[x] - 1, colour);
+					fix_line(x, py0z0 + 1, x, stencilHigh[x] - 1, 5);
 #endif
-				graphicsPut(x, py0z1, 5);
-				stencilHigh[x] = py0z1;
+					if (drawContour) {
+						graphicsPut(x, py0z0, 5);
+					}
+					stencilHigh[x] = py0z0;
+				}
+			}
+		} else {
+			for (x = px0z1; x < px1z1; ++x) {
+				if (stencilHigh[x] < py0z1) {
+#ifdef FILLED_POLYS
+					fix_line(x, py0z1 + 1, x, stencilHigh[x] - 1, 5);
+#endif
+					if (drawContour) {
+						graphicsPut(x, py0z1, 5);
+					}
+					stencilHigh[x] = py0z1;
+				}
 			}
 		}
-
 		x0 = px0z0;
 		x1 = px0z1;
 
@@ -268,9 +288,11 @@ return;
 				fy += fDeltatY;
 				if (stencilHigh[x] < iy) {
 #ifdef FILLED_POLYS
-					fix_line(x, iy + 1, x, stencilHigh[x] - 1, colour);
+					fix_line(x, iy + 1, x, stencilHigh[x] - 1, 5);
 #endif
-					graphicsPut(x, iy, 5);
+					if (drawContour) {
+						graphicsPut(x, iy, 5);
+					}
 					stencilHigh[x] = iy;
 				}
 			}
@@ -300,9 +322,11 @@ return;
 				fy += fDeltatY;
 				if (stencilHigh[x] < iy) {
 #ifdef FILLED_POLYS
-					fix_line(x, iy + 1, x, stencilHigh[x] - 1, colour);
+					fix_line(x, iy + 1, x, stencilHigh[x] - 1, 5);
 #endif
-					graphicsPut(x, iy, 5);
+					if (drawContour) {
+						graphicsPut(x, iy, 5);
+					}
 					stencilHigh[x] = iy;
 				}
 			}
@@ -320,19 +344,19 @@ return;
 
 		if (drawContour ) {
 			if (stencilLow[px0z0] > py1z0) {
-				vLine(px0z0, py1z0, stencilLow[px0z0] - 1, 9);
+				vLine(px0z0, py1z0, stencilLow[px0z0] - 1, 5);
 			}
 
 			if (stencilLow[px1z0] > py1z0) {
-				vLine(px1z0, py1z0, stencilLow[px1z0] - 1, 10);
+				vLine(px1z0, py1z0, stencilLow[px1z0] - 1, 5);
 			}
 
 			if (px0z1 < px0z0 && py1z1 < stencilLow[px0z1]) {
-				vLine(px0z1, py1z1, stencilLow[px0z1] - 1, 11);
+				vLine(px0z1, py1z1, stencilLow[px0z1] - 1, 5);
 			}
 
 			if (px1z1 > px1z0 && py1z1 < stencilLow[px1z1]) {
-				vLine(px1z1, py1z1, stencilLow[px1z1] - 1, 12);
+				vLine(px1z1, py1z1, stencilLow[px1z1] - 1, 5);
 			}
 		}
 
@@ -341,7 +365,7 @@ return;
 				if (stencilLow[x] > py1z1) {
 					if (drawContour) {
 #ifdef FILLED_POLYS
-						fix_line(x, py1z1 + 1, x, stencilLow[x] - 1, colour);
+						fix_line(x, py1z1 + 1, x, stencilLow[x] - 1, 5);
 #endif
 						graphicsPut(x, py1z1, 5);
 					}
@@ -354,7 +378,7 @@ return;
 				if (stencilLow[x] > py1z0) {
 					if (drawContour) {
 #ifdef FILLED_POLYS
-						fix_line(x, py1z0 + 1, x, stencilLow[x] - 1, colour);
+						fix_line(x, py1z0 + 1, x, stencilLow[x] - 1, 5);
 #endif
 						graphicsPut(x, py1z0, 6);
 					}
@@ -366,7 +390,7 @@ return;
 		x0 = px0z0;
 		x1 = px0z1;
 
-		if (drawContour && x0 != x1) {
+		if (x0 != x1) {
 
 			if (x0 > x1) {
 				x0 = x0 + x1;
@@ -386,10 +410,13 @@ return;
 				int iy = fixToInt(fy);
 				fy += fDeltatY;
 				if (stencilLow[x] > iy) {
+					if (drawContour) {
 #ifdef FILLED_POLYS
-					fix_line(x, iy + 1, x, stencilLow[x] - 1, colour);
+						fix_line(x, iy + 1, x, stencilLow[x] - 1, 5);
 #endif
-					graphicsPut(x, iy, 5);
+
+						graphicsPut(x, iy, 5);
+					}
 					stencilLow[x] = iy;
 				}
 			}
@@ -398,7 +425,7 @@ return;
 		x0 = px1z0;
 		x1 = px1z1;
 
-		if (drawContour && x0 != x1) {
+		if (x0 != x1) {
 
 			if (x0 > x1) {
 				x0 = x0 + x1;
@@ -418,10 +445,13 @@ return;
 				int iy = fixToInt(fy);
 				fy += fDeltatY;
 				if (stencilLow[x] > iy) {
+					if (drawContour) {
 #ifdef FILLED_POLYS
-					fix_line(x, iy + 1, x, stencilLow[x] - 1, colour);
+						fix_line(x, iy + 1, x, stencilLow[x] - 1, 5);
 #endif
-					graphicsPut(x, iy, 5);
+						graphicsPut(x, iy, 5);
+					}
+
 					stencilLow[x] = iy;
 				}
 			}
@@ -442,18 +472,18 @@ void drawPattern(int pattern, int x0, int x1, int y, int cameraX, int cameraZ) {
 
 	diff = patterns[0].ceiling - patterns[pattern].ceiling;
 	//if (diff)
-	/*
+
 	{
-		drawCubeAt(x - cameraX, patterns[pattern].ceiling, cameraZ - y, 1,
+		drawCubeAt(x0 - cameraX, patterns[pattern].ceiling, cameraZ - y, x1 - x0,
 				   diff, 1, 0, pattern);
-	}*/
+	}
 }
 
 int main(int argc, char **argv) {
 	int running = 1;
 	int8_t x, y = 0;
-	int8_t cameraX = 4;
-	int8_t cameraZ = 12;
+	int8_t cameraX = 7;
+	int8_t cameraZ = 15;
 	int lastPattern, lastIndex;
 
 	init();
@@ -509,7 +539,7 @@ int main(int argc, char **argv) {
 		vLine(0, 0, 127, 2);
 
 		hLine(0, 255, 0, 2);
-		hLine(0, fixToInt( Div( intToFix(64), intToFix(2)) ), 127, 2);
+		hLine(0, 255, 127, 2);
 
 
 

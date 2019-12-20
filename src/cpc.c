@@ -262,6 +262,12 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 
 	base = 0xC000 + (nColumn >> 1);
 
+	if ( y0 > y1 ) {
+		int16_t tmp = y0;
+		y0 = y1;
+		y1 = tmp;
+	}
+
 	for (nLine = y0; nLine < y1; nLine++) {
 		if (nLine < 0 || nLine >= 128) {
 			return;

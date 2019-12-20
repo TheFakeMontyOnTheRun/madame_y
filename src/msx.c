@@ -25,14 +25,60 @@ void shutdown() {
 }
 
 void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
+
+	if (y < 0 || y > 127 ) {
+		return;
+	}
+
+	if (x0 > x1 ) {
+		int16_t tmp = x0;
+		x0 = x1;
+		x1 = tmp;
+	}
+
+	if (x0 < 0 ) {
+		x0 = 0;
+	}
+
+	if (x1 > 255 ) {
+		x1 = 255;
+	}
+
 	fix_line(x0, y, x1, y, colour );
 }
 
 void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
+
+	if (x0 < 0 || x0 > 255 ) {
+		return;
+	}
+
+	if (y0 > y1 ) {
+		int16_t tmp = y0;
+		y0 = y1;
+		y1 = tmp;
+	}
+
+	if (y0 < 0 ) {
+		y0 = 0;
+	}
+
+	if (y1 > 127 ) {
+		y1 = 127;
+	}
+
 	fix_line(x0, y0, x0, y1, colour );
 }
 
 void graphicsPut( int x, int y, uint8_t colour ) {
+	if (y < 0 || y > 127 ) {
+		return;
+	}
+
+	if (x < 0 || x > 255 ) {
+		return;
+	}
+
   fix_line( x, y, x, y, 1);
 }
 
