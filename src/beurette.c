@@ -9,6 +9,8 @@
 //#define FILLED_POLYS
 #endif
 
+#define IN_RANGE(V0, V1, V)  ((V0) <= (V) && (V) <= (V1))
+
 void shutdown();
 
 void graphicsPut(int x, int y, uint8_t colour);
@@ -172,31 +174,41 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 	int16_t py0z1;
 	int16_t px1z1;
 	int16_t py1z1;
-	int drawContour = 1;
+
+	int drawContour;
 
 	z1 = z0 + dZ;
-	z0px = (projections[z0].px);
-	z0py = (projections[z0].py);
-	z1px = (projections[z1].px);
-	z1py = (projections[z1].py);
-	z0dx = (projections[z0].dx >> 3);
-	z0dy = (projections[z0].dy >> 2);
-	z1dx = (projections[z1].dx >> 3);
-	z1dy = (projections[z1].dy >> 2);
 
+	z0px = (projections[z0].px);
+	z1px = (projections[z1].px);
+	z0dx = (projections[z0].dx >> 3);
+	z1dx = (projections[z1].dx >> 3);
 
 	px0z0 = z0px - ((x0) * z0dx);
-	py0z0 = z0py - ((y0) * z0dy);
-	px1z0 = px0z0 - (dX * z0dx);
-	py1z0 = py0z0 - (dY * z0dy);
 	px0z1 = z1px - ((x0) * z1dx);
-	py0z1 = z1py - ((y0) * z1dy);
+
+	if ((px0z0 > 255 ) && (px0z1 > 255 )) {
+		return;
+	}
+
+	px1z0 = px0z0 - (dX * z0dx);
 	px1z1 = px0z1 - (dX * z1dx);
+
+	if ((px1z0 < 0 ) && (px1z1 < 0 )) {
+		return;
+	}
+
+	z1py = (projections[z1].py);
+	z0dy = (projections[z0].dy >> 2);
+	z1dy = (projections[z1].dy >> 2);
+	z0py = (projections[z0].py);
+
+	py0z0 = z0py - ((y0) * z0dy);
+	py1z0 = py0z0 - (dY * z0dy);
+	py0z1 = z1py - ((y0) * z1dy);
 	py1z1 = py0z1 - (dY * z1dy);
 
-	if (py0z0 == py1z0 ) {
-		drawContour = 0;
-	}
+	drawContour = (py0z0 != py1z0 );
 
 #ifdef DEBUG_WIREFRAME
 	fix_line( px0z0, py0z0, px1z0, py0z0, 4);
@@ -222,26 +234,26 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 		int x, x0, x1;
 
 		if (drawContour ) {
-			if (stencilHigh[px0z0] < py0z0) {
+			if (IN_RANGE(0, 255, px0z0) && stencilHigh[px0z0] < py0z0 ) {
 				vLine(px0z0, py0z0, stencilHigh[px0z0] + 1, 5);
 			}
 
-			if (stencilHigh[px1z0] < py0z0) {
+			if (IN_RANGE(0, 255, px1z0) && stencilHigh[px1z0] < py0z0) {
 				vLine(px1z0, py0z0, stencilHigh[px1z0] + 1, 5);
 			}
 
-			if (px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
+			if (IN_RANGE(0, 255, px0z1) && px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
 				vLine(px0z1, py0z1, stencilHigh[px0z1] + 1, 5);
 			}
 
-			if (px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
+			if (IN_RANGE(0, 255, px1z1) && px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
 				vLine(px1z1, py0z1, stencilHigh[px1z1] + 1, 5);
 			}
 		}
 
 		if (py0z0 > py0z1) {
 			for (x = px0z0; x < px1z0; ++x) {
-				if (stencilHigh[x] < py0z0) {
+				if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z0) {
 #ifdef FILLED_POLYS
 					fix_line(x, py0z0 + 1, x, stencilHigh[x] - 1, 5);
 #endif
@@ -253,7 +265,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 			}
 		} else {
 			for (x = px0z1; x < px1z1; ++x) {
-				if (stencilHigh[x] < py0z1) {
+				if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z1) {
 #ifdef FILLED_POLYS
 					fix_line(x, py0z1 + 1, x, stencilHigh[x] - 1, 5);
 #endif
@@ -286,7 +298,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
 				int iy = fixToInt(fy);
 				fy += fDeltatY;
-				if (stencilHigh[x] < iy) {
+				if (IN_RANGE(0, 255, x) && stencilHigh[x] < iy) {
 #ifdef FILLED_POLYS
 					fix_line(x, iy + 1, x, stencilHigh[x] - 1, 5);
 #endif
@@ -320,7 +332,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
 				int iy = fixToInt(fy);
 				fy += fDeltatY;
-				if (stencilHigh[x] < iy) {
+				if (IN_RANGE(0, 255, x) && stencilHigh[x] < iy) {
 #ifdef FILLED_POLYS
 					fix_line(x, iy + 1, x, stencilHigh[x] - 1, 5);
 #endif
@@ -343,26 +355,26 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 		int x, x0, x1;
 
 		if (drawContour ) {
-			if (stencilLow[px0z0] > py1z0) {
+			if (IN_RANGE(0, 255, px0z0) && stencilLow[px0z0] > py1z0) {
 				vLine(px0z0, py1z0, stencilLow[px0z0] - 1, 5);
 			}
 
-			if (stencilLow[px1z0] > py1z0) {
+			if (IN_RANGE(0, 255, px1z0) && stencilLow[px1z0] > py1z0) {
 				vLine(px1z0, py1z0, stencilLow[px1z0] - 1, 5);
 			}
 
-			if (px0z1 < px0z0 && py1z1 < stencilLow[px0z1]) {
+			if (IN_RANGE(0, 255, px0z1) && px0z1 < px0z0 && py1z1 < stencilLow[px0z1]) {
 				vLine(px0z1, py1z1, stencilLow[px0z1] - 1, 5);
 			}
 
-			if (px1z1 > px1z0 && py1z1 < stencilLow[px1z1]) {
+			if (IN_RANGE(0, 255, px1z1) && px1z1 > px1z0 && py1z1 < stencilLow[px1z1]) {
 				vLine(px1z1, py1z1, stencilLow[px1z1] - 1, 5);
 			}
 		}
 
 		if (py1z0 > py1z1) {
 			for (x = px0z1; x < px1z1; ++x) {
-				if (stencilLow[x] > py1z1) {
+				if (IN_RANGE(0, 255, x) && stencilLow[x] > py1z1) {
 					if (drawContour) {
 #ifdef FILLED_POLYS
 						fix_line(x, py1z1 + 1, x, stencilLow[x] - 1, 5);
@@ -375,7 +387,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 			}
 		} else {
 			for (x = px0z0; x < px1z0; ++x) {
-				if (stencilLow[x] > py1z0) {
+				if (IN_RANGE(0, 255, x) && stencilLow[x] > py1z0) {
 					if (drawContour) {
 #ifdef FILLED_POLYS
 						fix_line(x, py1z0 + 1, x, stencilLow[x] - 1, 5);
@@ -409,7 +421,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
 				int iy = fixToInt(fy);
 				fy += fDeltatY;
-				if (stencilLow[x] > iy) {
+				if (IN_RANGE(0, 255, x) && stencilLow[x] > iy) {
 					if (drawContour) {
 #ifdef FILLED_POLYS
 						fix_line(x, iy + 1, x, stencilLow[x] - 1, 5);
@@ -444,7 +456,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
 				int iy = fixToInt(fy);
 				fy += fDeltatY;
-				if (stencilLow[x] > iy) {
+				if (IN_RANGE(0, 255, x) && stencilLow[x] > iy) {
 					if (drawContour) {
 #ifdef FILLED_POLYS
 						fix_line(x, iy + 1, x, stencilLow[x] - 1, 5);
