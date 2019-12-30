@@ -234,30 +234,30 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 		mask1 = 85;
 
 		if (colour & 1)
-			mask2 = 128;
+			mask2 |= 128;
 
 		if (colour & 2)
-			mask2 = 8;
+			mask2 |= 8;
 
 		if (colour & 4)
-			mask2 = 32;
+			mask2 |= 32;
 
 		if (colour & 8)
-			mask2 = 2;
+			mask2 |= 2;
 	} else {
 		mask1 = 170;
 
 		if (colour & 1)
-			mask2 = 64;
+			mask2 |= 64;
 
 		if (colour & 2)
-			mask2 = 4;
+			mask2 |= 4;
 
 		if (colour & 4)
-			mask2 = 16;
+			mask2 |= 16;
 
 		if (colour & 8)
-			mask2 = 1;
+			mask2 |= 1;
 	}
 
 	base = 0xC000 + (nColumn >> 1);
