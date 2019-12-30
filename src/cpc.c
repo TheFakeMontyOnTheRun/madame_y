@@ -152,20 +152,31 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int colour) {
 		y1 = y0 - y1;
 		y0 = y0 - y1;
 	}
-
 	{
-		FixP_t fy = intToFix(y0);
-		FixP_t fDeltatY = Div(intToFix(y1 - y0), intToFix(x1 - x0));
+		//https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 
-		for (int16_t x = x0; x <= x1; ++x) {
-			int iy = fixToInt(fy);
-			fy += fDeltatY;
+		int dx = abs(x1 - x0);
+		int sx = x0 < x1 ? 1 : -1;
+		int dy = -abs(y1 - y0);
+		int sy = y0 < y1 ? 1 : -1;
+		int err = dx + dy;  /* error value e_xy */
+		int e2;
+		while (1) {
+			graphicsPut(x0, y0, colour);
+			/* loop */
+			if (x0 == x1 && y0 == y1) return;
+			e2 = 2 * err;
 
-			if (x < 0 || x >= 256 || iy < 0 || iy >= 128) {
-				continue;
+			if (e2 >= dy) {
+				err += dy; /* e_xy+e_x > 0 */
+				x0 += sx;
 			}
-			graphicsPut(x, iy, colour);
 
+			if (e2 <= dx) {
+				/* e_xy+e_y < 0 */
+				err += dx;
+				y0 += sy;
+			}
 		}
 	}
 #else
