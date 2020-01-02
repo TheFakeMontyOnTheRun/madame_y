@@ -47,17 +47,17 @@ uint8_t getKey() {
 void init() {
 	cpct_disableFirmware();
 
-
-	cpct_drw_populateLineMasks_mode0();
-	cpct_drw_setLineColour_mode0(1);
+	cpct_setVideoMode(0);
 
 	cpct_memset_f64(SCR_C000, 0x0000, 16384);
 
-	cpct_setVideoMemoryPage(cpct_pageC0);
-	cpct_setVideoMode(0);
+	page = 0;
 
-	page = 0x80;
+#ifndef USE_FIXP_FOR_LINES
+	cpct_drw_populateLineMasks_mode0();
+	cpct_drw_setLineColour_mode0(1);
 	cpct_drw_setClippingBox_mode0(0, 128, 0, 128);
+#endif
 }
 
 void graphicsFlush() {
@@ -209,7 +209,7 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 			if ( nLine < 0 || nLine >= 200 ) {
 				continue;
 			}
-			pScreen =  ((unsigned char *) 0xC000 + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
+			pScreen =  ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
 			SetMode0PixelColor(pScreen, colour, nPixel);
 		}
 	}
@@ -221,7 +221,7 @@ void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
 
 void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 	unsigned char *pScreen = (unsigned char *) 0xC000;
-	uint16_t base;
+	unsigned char * base;
 	unsigned char nByte;
 	int16_t nLine = 0;
 	int16_t nColumn = 0;
@@ -238,8 +238,6 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 	}
 
 	nPixel = nColumn & 1;
-
-	pScreen = (unsigned char *) 0xC000;
 
 	if (nPixel == 0) {
 		mask1 = 85;
@@ -271,7 +269,7 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 			mask2 |= 1;
 	}
 
-	base = 0xC000 + (nColumn >> 1);
+	base = pScreen + (nColumn >> 1);
 
 	if ( y0 > y1 ) {
 		int16_t tmp = y0;
@@ -304,7 +302,7 @@ void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
 
 	nPixel = nColumn & 1;
 
-	pScreen =  ((unsigned char *) 0xC000 + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
+	pScreen =  ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
 	nByte = *pScreen;
 
 	if (nPixel == 0) {
