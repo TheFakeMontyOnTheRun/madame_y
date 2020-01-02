@@ -33,6 +33,10 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour);
 uint8_t stencilHigh[256];
 uint8_t stencilLow[256];
 
+int8_t cameraX = 33;
+int8_t cameraY = 2;
+int8_t cameraZ = 22;
+
 struct Projection {
 	uint8_t px;
 	uint8_t py;
@@ -476,7 +480,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 						vLine(x0, y0 + 1, stencilLow[x0] - 1, 5);
 #endif
 						if (drawContour) {
-							graphicsPut(x0, y0, 3);
+							graphicsPut(x0, y0, 5);
 						}
 						stencilLow[x0] = y0;
 					}
@@ -523,9 +527,13 @@ void drawPattern(int pattern, int x0, int x1, int y, int cameraX, int cameraZ) {
 int main(int argc, char **argv) {
 	int running = 1;
 	int8_t x, y = 0;
-	int8_t cameraX = 33;
-	int8_t cameraZ = 22;
 	int lastPattern, lastIndex;
+	int prevX;
+	int prevZ;
+	cameraX = 5;
+	cameraY = 0;
+	cameraZ = 18;
+
 
 	init();
 	memset(stencilLow, 0xFF, 256);
@@ -533,7 +541,8 @@ int main(int argc, char **argv) {
 
 
 	do {
-
+		prevX = cameraX;
+		prevZ = cameraZ;
 
 		waitkey:
 		switch (getKey()) {
@@ -574,6 +583,11 @@ int main(int argc, char **argv) {
 			cameraX = 0;
 		}
 
+		if ( patterns[map[cameraZ - 2][cameraX]].floor  != patterns[0].floor || patterns[map[cameraZ - 2][cameraX]].ceiling < 1 ) {
+			cameraX = prevX;
+			cameraZ = prevZ;
+		}
+
 		clear();
 
 		vLine(255, 0, 127, 2);
@@ -589,7 +603,7 @@ int main(int argc, char **argv) {
 			lastIndex = cameraX;
 			lastPattern = map[y][lastIndex];
 
-			for (x = lastIndex; x < min(cameraX + 4 + ((cameraZ - 3) - y), 40); ++x) {
+			for (x = lastIndex; x < min(cameraX + 5 + ((cameraZ - 3) - y), 40); ++x) {
 				int pattern = map[y][x];
 
 				if (pattern != lastPattern ) {
@@ -607,7 +621,7 @@ int main(int argc, char **argv) {
 			lastIndex = max(cameraX - 1, 0);
 			lastPattern = map[y][lastIndex];
 
-			for (x = lastIndex; x >= max(cameraX - 2 - ((cameraZ - 3) - y), 0); --x) {
+			for (x = lastIndex; x >= max(cameraX - 3 - ((cameraZ - 3) - y), 0); --x) {
 				int pattern = map[y][x];
 
 				if (pattern != lastPattern ) {
