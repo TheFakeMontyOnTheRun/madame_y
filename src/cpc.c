@@ -193,9 +193,6 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 	int16_t nColumn = 0;
 	int16_t nPixel = 0;
 
-	x0 = x0 / 2;
-	x1 = x1 / 2;
-
 	for(nColumn = x0; nColumn < x1; nColumn++)
 	{
 		if ( nColumn < 0 || nColumn >= 128 ) {
@@ -228,8 +225,6 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 	int16_t nPixel = 0;
 	uint8_t mask1 = 0;
 	uint8_t mask2 = 0;
-
-	x0 = x0 >> 1;
 
 	nColumn = x0;
 
@@ -277,6 +272,22 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 		y1 = tmp;
 	}
 
+	if (y0 < 0) {
+		y0 = 0;
+	}
+
+	if (y0 >= 128) {
+		y0 = 127;
+	}
+
+	if (y1 < 0) {
+		y1 = 0;
+	}
+
+	if (y1 >= 128) {
+		y1 = 127;
+	}
+
 	for (nLine = y0; nLine < y1; nLine++) {
 		if (nLine < 0 || nLine >= 128) {
 			return;
@@ -294,7 +305,6 @@ void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
 	unsigned char *pScreen = (unsigned char *) 0xC000;
 	unsigned char nPixel = 0;
 	unsigned char nByte;
-	nColumn = nColumn >> 1;
 
 	if (nColumn < 0 || nColumn >= 128 || nLine < 0 || nLine >= 200 ) {
 		return;
