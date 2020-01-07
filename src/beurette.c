@@ -544,29 +544,6 @@ int main(int argc, char **argv) {
 		prevX = cameraX;
 		prevZ = cameraZ;
 
-		waitkey:
-		switch (getKey()) {
-			case 'a':
-				cameraX--;
-				break;
-			case 'd':
-				cameraX++;
-				break;
-			case 's':
-				cameraZ++;
-				break;
-			case 'q':
-				running = 0;
-				break;
-			case 'w':
-				cameraZ--;
-				break;
-#ifndef SDLSW
-			default:
-			  goto waitkey;
-#endif
-		}
-
 		if (cameraZ >= 40) {
 			cameraZ = 39;
 		}
@@ -642,6 +619,31 @@ int main(int argc, char **argv) {
 
 		graphicsFlush();
 
+		memset(stencilLow, 0xFF, 64);
+		memset(stencilHigh, 0, 64);
+
+		waitkey:
+		switch (getKey()) {
+			case 'a':
+				cameraX--;
+				break;
+			case 'd':
+				cameraX++;
+				break;
+			case 's':
+				cameraZ++;
+				break;
+			case 'q':
+				running = 0;
+				break;
+			case 'w':
+				cameraZ--;
+				break;
+#if !defined(SDLSW) || !defined(AMIGA)
+			default:
+			  goto waitkey;
+#endif
+		}
 	} while (running);
 
 	shutdown();
