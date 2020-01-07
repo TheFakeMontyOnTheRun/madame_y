@@ -10,19 +10,27 @@
 #define SCR_4000 (u8*)0x4000
 #define SCR_C000 (u8*)0xC000
 
+//#define DBL_BUFFER
 #define USE_FIXP_FOR_LINES
 
 u8 page;
+uint8_t* backBuffer;
 
 void shutdown() {
 }
 
 
 void clear() {
-	cpct_memset_f64(SCR_C000, 0x0000, 16384);
+#ifdef DBL_BUFFER
+	cpct_memset_f64(backBuffer, 0, 80 * 200);
+#else
+	cpct_memset_f64((uint8_t*)0xC000, 0, 80 * 200);
+#endif
 }
 
 void graphicsPut(int nColumn, int nLine, uint8_t nColor);
+
+void writeStr( int nColumn, int nLine, char* str, int fg, int bg );
 
 uint8_t getKey() {
 
@@ -49,8 +57,11 @@ void init() {
 
 	cpct_setVideoMode(0);
 
-	cpct_memset_f64(SCR_C000, 0x0000, 16384);
-
+	cpct_memset_f64(SCR_C000, 0x0000, 80 * 200);
+#ifdef DBL_BUFFER
+	backBuffer = (uint8_t*)malloc(80 * 200);
+	clear();
+#endif
 	page = 0;
 
 #ifndef USE_FIXP_FOR_LINES
@@ -61,7 +72,10 @@ void init() {
 }
 
 void graphicsFlush() {
-
+#ifdef DBL_BUFFER
+	char buffer[32];
+	cpct_memcpy(SCR_C000, backBuffer, 80 * 200);
+#endif
 }
 
 void SetMode0PixelColor(unsigned char *pByteAddress, unsigned char nColor, unsigned char nPixel) {
@@ -186,9 +200,14 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int colour) {
 }
 
 void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
+	uint8_t* pScreen = (uint8_t*)
+#ifdef DBL_BUFFER
+			backBuffer;
+#else
+			0xC000;
+#endif
 
-
-	unsigned char *pScreen = (unsigned char *)0xC000;
+	unsigned char *pS;
 	int16_t nLine = 0;
 	int16_t nColumn = 0;
 	int16_t nPixel = 0;
@@ -206,18 +225,108 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 			if ( nLine < 0 || nLine >= 200 ) {
 				continue;
 			}
-			pScreen =  ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
-			SetMode0PixelColor(pScreen, colour, nPixel);
+			pS =  ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
+			SetMode0PixelColor(pS, colour, nPixel);
 		}
 	}
 }
 
-void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
-	fix_line( x0, y, x1, y, colour );
-}
+void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t nColor) {
+	uint8_t* pScreen = (uint8_t*)
+#ifdef DBL_BUFFER
+			backBuffer;
+#else
+			0xC000;
+#endif
+	unsigned char *pS;
+	unsigned char *base;
+	int16_t nLine = 0;
+	int16_t nColumn = 0;
+	int16_t nPixel = 0;
+	uint8_t mask1 = 0;
+	uint8_t mask2 = 0;
+	uint8_t mask3 = 0;
+	uint8_t mask4 = 0;
 
+
+	if (y < 0 || y >= 128) {
+		return;
+	}
+
+	mask1 = 85;
+
+	if (nColor & 1)
+		mask2 |= 128;
+
+	if (nColor & 2)
+		mask2 |= 8;
+
+	if (nColor & 4)
+		mask2 |= 32;
+
+	if (nColor & 8)
+		mask2 |= 2;
+
+	mask3 = 170;
+
+	if (nColor & 1)
+		mask4 |= 64;
+
+	if (nColor & 2)
+		mask4 |= 4;
+
+	if (nColor & 4)
+		mask4 |= 16;
+
+	if (nColor & 8)
+		mask4 |= 1;
+
+	if (x0 < 0) {
+		x0 = 0;
+	}
+
+	if (x0 >= 64) {
+		x0 = 63;
+	}
+
+	if (x1 < 0) {
+		x1 = 0;
+	}
+
+	if (x1 >= 64) {
+		x1 = 63;
+	}
+
+	base = ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048));
+
+	for (nColumn = x0; nColumn < x1; nColumn++) {
+		unsigned char nByte;
+
+		nPixel = nColumn & 1;
+		pS = base + (nColumn >> 1);
+		nByte = *pS;
+
+		if (nPixel == 0) {
+			nByte &= mask1;
+			nByte |= mask2;
+
+		} else {
+			nByte &= mask3;
+			nByte |= mask4;
+		}
+
+		*pS = nByte;
+	}
+}
 void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
-	unsigned char *pScreen = (unsigned char *) 0xC000;
+	uint8_t* pScreen = (uint8_t*)
+#ifdef DBL_BUFFER
+			backBuffer;
+#else
+			0xC000;
+#endif
+
+	unsigned char *pS;
 	unsigned char * base;
 	unsigned char nByte;
 	int16_t nLine = 0;
@@ -289,20 +398,16 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 	}
 
 	for (nLine = y0; nLine < y1; nLine++) {
-		if (nLine < 0 || nLine >= 128) {
-			return;
-		}
-		pScreen =  ((unsigned char *) base + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) ;
-		nByte = *pScreen;
+		pS =  ((unsigned char *) base + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) ;
+		nByte = *pS;
 		nByte &= mask1;
 		nByte |= mask2;
-		*pScreen = nByte;
+		*pS = nByte;
 	}
 }
 
-void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
-#ifdef USE_FIXP_FOR_LINES
-	unsigned char *pScreen = (unsigned char *) 0xC000;
+void writeStr( int nColumn, int nLine, char* str, int fg, int bg ) {
+	unsigned char *pS;
 	unsigned char nPixel = 0;
 	unsigned char nByte;
 
@@ -312,8 +417,31 @@ void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
 
 	nPixel = nColumn & 1;
 
-	pScreen =  ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
-	nByte = *pScreen;
+	pS =  ((unsigned char *) pS + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
+	/* cpct_drawStringM0(str, pS, fg, bg ); */
+}
+
+void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
+#ifdef USE_FIXP_FOR_LINES
+	uint8_t* pScreen = (uint8_t*)
+#ifdef DBL_BUFFER
+			backBuffer;
+#else
+			0xC000;
+#endif
+
+	unsigned char *pS;
+	unsigned char nPixel = 0;
+	unsigned char nByte;
+
+	if (nColumn < 0 || nColumn >= 128 || nLine < 0 || nLine >= 200 ) {
+		return;
+	}
+
+	nPixel = nColumn & 1;
+
+	pS =  ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
+	nByte = *pS;
 
 	if (nPixel == 0) {
 		nByte &= 85;
@@ -345,7 +473,7 @@ void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
 			nByte |= 1;
 	}
 
-	*pScreen = nByte;
+	*pS = nByte;
 #else
 	fix_line(nColumn, nLine, nColumn, nLine, nColor);
 #endif
