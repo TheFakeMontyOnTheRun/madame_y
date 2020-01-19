@@ -19,7 +19,6 @@ void graphicsFlush();
 
 void graphicsPut(int x, int y, int colour) {
 
-	x = x / 2;
 
 	if (x < 0 || x > 160 || y < 0 || y > 200) {
 		return;
@@ -138,6 +137,10 @@ void shutdown() {
 
 void clear() {
 	memset(framebuffer, 0, 160 * 200);
+}
+
+void writeStr( int nColumn, int nLine, char* str, int fg, int bg ) {
+
 }
 
 uint8_t getKey() {
