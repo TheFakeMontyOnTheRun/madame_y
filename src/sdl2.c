@@ -17,7 +17,7 @@ uint32_t palette[16];
 uint8_t framebuffer[160 * 200];
 void graphicsFlush();
 
-void graphicsPut(int x, int y, int colour) {
+void graphicsPut(uint8_t x, uint8_t y, uint8_t colour) {
 
 
 	if (x < 0 || x > 160 || y < 0 || y > 200) {
@@ -34,7 +34,7 @@ void graphicsPut(int x, int y, int colour) {
 }
 
 
-void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
+void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 
 	if (x0 == x1) {
 
@@ -116,16 +116,16 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
 	}
 }
 
-void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
+void hLine(uint8_t x0, uint8_t x1, uint8_t y, uint8_t colour) {
 	fix_line(x0, y, x1, y, colour );
 }
 
-void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
+void vLine(uint8_t x0, uint8_t y0, uint8_t y1, uint8_t colour) {
 	fix_line(x0, y0, x0, y1, colour );
 }
 
 
-void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
+void graphicsFill(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 
 }
 
@@ -139,7 +139,7 @@ void clear() {
 	memset(framebuffer, 0, 160 * 200);
 }
 
-void writeStr( int nColumn, int nLine, char* str, int fg, int bg ) {
+void writeStr( uint8_t nColumn, uint8_t nLine, char* str, uint8_t fg, uint8_t bg ) {
 
 }
 

@@ -28,9 +28,9 @@ void clear() {
 #endif
 }
 
-void graphicsPut(int nColumn, int nLine, uint8_t nColor);
+void graphicsPut(uint8_t nColumn, uint8_t nLine, uint8_t nColor);
 
-void writeStr( int nColumn, int nLine, char* str, int fg, int bg );
+void writeStr( uint8_t nColumn, uint8_t nLine, char* str, uint8_t fg, uint8_t bg );
 
 uint8_t getKey() {
 
@@ -114,12 +114,12 @@ void SetMode0PixelColor(unsigned char *pByteAddress, unsigned char nColor, unsig
 	*pByteAddress = nByte;
 }
 
-void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int colour) {
+void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 #ifdef USE_FIXP_FOR_LINES
 	if (x0 == x1) {
 
-		int16_t _y0 = y0;
-		int16_t _y1 = y1;
+        uint8_t _y0 = y0;
+        uint8_t _y1 = y1;
 
 		if (y0 > y1) {
 			_y0 = y1;
@@ -127,8 +127,8 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int colour) {
 		}
 
 
-		for (int16_t y = _y0; y <= _y1; ++y) {
-			if (x0 < 0 || x0 >= 256 || y < 0 || y >= 128) {
+		for (uint8_t y = _y0; y <= _y1; ++y) {
+			if (y >= 128) {
 				continue;
 			}
 
@@ -138,16 +138,16 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int colour) {
 	}
 
 	if (y0 == y1) {
-		int16_t _x0 = x0;
-		int16_t _x1 = x1;
+        uint8_t _x0 = x0;
+        uint8_t _x1 = x1;
 
 		if (x0 > x1) {
 			_x0 = x1;
 			_x1 = x0;
 		}
 
-		for (int16_t x = _x0; x <= _x1; ++x) {
-			if (x < 0 || x >= 256 || y0 < 0 || y0 >= 128) {
+		for (uint8_t x = _x0; x <= _x1; ++x) {
+			if (y0 >= 128) {
 				continue;
 			}
 
@@ -169,12 +169,12 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int colour) {
 	{
 		//https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 
-		int dx = abs(x1 - x0);
-		int sx = x0 < x1 ? 1 : -1;
-		int dy = -abs(y1 - y0);
-		int sy = y0 < y1 ? 1 : -1;
-		int err = dx + dy;  /* error value e_xy */
-		int e2;
+		int8_t dx = abs(x1 - x0);
+		int8_t sx = x0 < x1 ? 1 : -1;
+		int8_t dy = -abs(y1 - y0);
+		int8_t sy = y0 < y1 ? 1 : -1;
+		int8_t err = dx + dy;  /* error value e_xy */
+		int8_t e2;
 		while (1) {
 			graphicsPut(x0, y0, colour);
 			/* loop */
@@ -199,7 +199,7 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int colour) {
 #endif
 }
 
-void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
+void graphicsFill(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 	uint8_t* pScreen = (uint8_t*)
 #ifdef DBL_BUFFER
 			backBuffer;
@@ -208,13 +208,13 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 #endif
 
 	unsigned char *pS;
-	int16_t nLine = 0;
-	int16_t nColumn = 0;
-	int16_t nPixel = 0;
+    uint8_t nLine = 0;
+    uint8_t nColumn = 0;
+    uint8_t nPixel = 0;
 
 	for(nColumn = x0; nColumn < x1; nColumn++)
 	{
-		if ( nColumn < 0 || nColumn >= 128 ) {
+		if ( nColumn >= 128 ) {
 			continue;
 		}
 
@@ -222,7 +222,7 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 
 		for(nLine = y0; nLine < y1; nLine++)
 		{
-			if ( nLine < 0 || nLine >= 200 ) {
+			if ( nLine >= 200 ) {
 				continue;
 			}
 			pS =  ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
@@ -231,7 +231,7 @@ void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour
 	}
 }
 
-void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t nColor) {
+void hLine(uint8_t x0, uint8_t x1, uint8_t y, uint8_t nColor) {
 	uint8_t* pScreen = (uint8_t*)
 #ifdef DBL_BUFFER
 			backBuffer;
@@ -240,16 +240,16 @@ void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t nColor) {
 #endif
 	unsigned char *pS;
 	unsigned char *base;
-	int16_t nLine = 0;
-	int16_t nColumn = 0;
-	int16_t nPixel = 0;
+    uint8_t nLine = 0;
+    uint8_t nColumn = 0;
+    uint8_t nPixel = 0;
 	uint8_t mask1 = 0;
 	uint8_t mask2 = 0;
 	uint8_t mask3 = 0;
 	uint8_t mask4 = 0;
 
 
-	if (y < 0 || y >= 128) {
+	if (y >= 128) {
 		return;
 	}
 
@@ -281,20 +281,12 @@ void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t nColor) {
 	if (nColor & 8)
 		mask4 |= 1;
 
-	if (x0 < 0) {
-		x0 = 0;
+	if (x0 >= 128) {
+		x0 = 127;
 	}
 
-	if (x0 >= 64) {
-		x0 = 63;
-	}
-
-	if (x1 < 0) {
-		x1 = 0;
-	}
-
-	if (x1 >= 64) {
-		x1 = 63;
+	if (x1 >= 128) {
+		x1 = 127;
 	}
 
 	base = ((unsigned char *) pScreen + ((nLine / 8) * 80) + ((nLine % 8) * 2048));
@@ -318,7 +310,7 @@ void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t nColor) {
 		*pS = nByte;
 	}
 }
-void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
+void vLine(uint8_t x0, uint8_t y0, uint8_t y1, uint8_t colour) {
 	uint8_t* pScreen = (uint8_t*)
 #ifdef DBL_BUFFER
 			backBuffer;
@@ -329,15 +321,15 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 	unsigned char *pS;
 	unsigned char * base;
 	unsigned char nByte;
-	int16_t nLine = 0;
-	int16_t nColumn = 0;
-	int16_t nPixel = 0;
+	uint8_t nLine = 0;
+    uint8_t nColumn = 0;
+    uint8_t nPixel = 0;
 	uint8_t mask1 = 0;
 	uint8_t mask2 = 0;
 
 	nColumn = x0;
 
-	if (nColumn < 0 || nColumn >= 128) {
+	if (nColumn >= 128) {
 		return;
 	}
 
@@ -376,21 +368,13 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 	base = pScreen + (nColumn >> 1);
 
 	if ( y0 > y1 ) {
-		int16_t tmp = y0;
+        uint8_t tmp = y0;
 		y0 = y1;
 		y1 = tmp;
 	}
 
-	if (y0 < 0) {
-		y0 = 0;
-	}
-
 	if (y0 >= 128) {
 		y0 = 127;
-	}
-
-	if (y1 < 0) {
-		y1 = 0;
 	}
 
 	if (y1 >= 128) {
@@ -406,22 +390,27 @@ void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
 	}
 }
 
-void writeStr( int nColumn, int nLine, char* str, int fg, int bg ) {
-	unsigned char *pS;
+void writeStr( uint8_t nColumn, uint8_t nLine, char* str, uint8_t fg, uint8_t bg ) {
+	unsigned char *pS = (uint8_t*)
+#ifdef DBL_BUFFER
+            backBuffer;
+#else
+            0xC000;
+#endif
 	unsigned char nPixel = 0;
-	unsigned char nByte;
 
-	if (nColumn < 0 || nColumn >= 128 || nLine < 0 || nLine >= 200 ) {
+	if (nColumn >= 128 || nLine >= 200 ) {
 		return;
 	}
 
 	nPixel = nColumn & 1;
 
 	pS =  ((unsigned char *) pS + ((nLine / 8) * 80) + ((nLine % 8) * 2048)) + (nColumn >> 1);
-	/* cpct_drawStringM0(str, pS, fg, bg ); */
+
+	cpct_drawStringM0(str, pS, fg, bg );
 }
 
-void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
+void graphicsPut(uint8_t nColumn, uint8_t nLine, uint8_t nColor) {
 #ifdef USE_FIXP_FOR_LINES
 	uint8_t* pScreen = (uint8_t*)
 #ifdef DBL_BUFFER
@@ -434,7 +423,7 @@ void graphicsPut(int nColumn, int nLine, uint8_t nColor) {
 	unsigned char nPixel = 0;
 	unsigned char nByte;
 
-	if (nColumn < 0 || nColumn >= 128 || nLine < 0 || nLine >= 200 ) {
+	if (nColumn >= 128 || nLine >= 200 ) {
 		return;
 	}
 

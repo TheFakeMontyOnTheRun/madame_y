@@ -12,9 +12,11 @@
 
 void shutdown();
 
-void graphicsPut(int x, int y, uint8_t colour);
+void writeStr( uint8_t nColumn, uint8_t nLine, char* str, uint8_t fg, uint8_t bg );
 
-void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour);
+void graphicsPut(uint8_t x, uint8_t y, uint8_t colour);
+
+void graphicsFill(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour);
 
 void clear();
 
@@ -24,17 +26,15 @@ void init();
 
 void graphicsFlush();
 
-void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int colour);
+void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour);
 
-void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour);
+void hLine(uint8_t x0, uint8_t x1, uint8_t y, uint8_t colour);
 
-void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour);
+void vLine(uint8_t x0, uint8_t y0, uint8_t y1, uint8_t colour);
 
-uint8_t stencilHigh[64];
-uint8_t stencilLow[64];
+int8_t stencilHigh[128];
 
 int8_t cameraX = 33;
-int8_t cameraY = 2;
 int8_t cameraZ = 22;
 
 struct Projection {
@@ -46,9 +46,8 @@ struct Projection {
 
 
 struct Pattern {
-	int16_t ceiling;
-	int16_t floor;
-	uint8_t blockVisibility;
+	int8_t ceiling;
+	int8_t floor;
 };
 
 const struct Projection projections[41] =
@@ -104,89 +103,89 @@ const struct Pattern patterns[16] = {
 		{2, -1, 0}, //3
 		{5, -1, 0}, //4
 		{3, 2, 0}, //5
-		{5, 1, 0} //6
+		{5, 0, 0}, //6
+		{3, -1, 0} //7
 };
 
 const int8_t map[40][40] = {
-		{4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 4, 4, 4, 4, 4, 4, 4, 2, 4, 2, 2, 2, 2, 2, 4, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 4, 4, 4, 2, 4, 2, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 2, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 2, 2, 3, 3, 3, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
-		{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4}
+		{7, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 2, 2, 2, 2, 2, 7, 2, 2, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 2, 7, 7, 7, 7, 7, 7, 7, 2, 2, 2, 7, 7, 7, 2, 7, 2, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 2, 7, 2, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 2, 2, 2, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 2, 7, 7, 7, 7, 7, 2, 2, 2, 2, 2, 2, 2, 7, 7, 7, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 2, 7, 7, 7, 7, 7, 2, 7, 7, 7, 7, 7, 2, 7, 7, 7, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 2, 7, 7, 7, 7, 7, 2, 7, 7, 7, 7, 7, 2, 2, 2, 2, 2, 2, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 2, 2, 3, 3, 3, 2, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 2, 3, 3, 7, 7, 2, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 2, 7, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 7, 7, 2, 7, 7, 7, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 2, 2, 2, 2, 2, 2, 2, 2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{2, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
+		{7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4}
 };
 
-int max(int x1, int x2) {
+int8_t max(int8_t x1, int8_t x2) {
 	return x1 > x2 ? x1 : x2;
 }
 
-int min(int x1, int x2) {
+int8_t min(int8_t x1, int8_t x2) {
 	return x1 < x2 ? x1 : x2;
 }
 
-void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ, int low, int colour) {
+void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ, uint8_t low, uint8_t colour) {
 
 	int8_t z1;
 	uint8_t z0px;
 	uint8_t z0py;
 	uint8_t z1px;
 	uint8_t z1py;
-	int16_t z0dx;
-	int16_t z0dy;
-	int16_t z1dx;
-	int16_t z1dy;
+	int8_t z0dx;
+	int8_t z0dy;
+	int8_t z1dx;
+	int8_t z1dy;
 
 	int16_t px0z0;
-	int16_t py0z0;
+	int8_t py0z0;
 	int16_t px1z0;
-	int16_t py1z0;
+	int8_t py1z0;
 	int16_t px0z1;
-	int16_t py0z1;
+	int8_t py0z1;
 	int16_t px1z1;
-	int16_t py1z1;
 
-	int drawContour;
+	uint8_t drawContour;
 
 	z1 = z0 + dZ;
 
-	z0px = (projections[z0].px);
-	z1px = (projections[z1].px);
-	z0dx = (projections[z0].dx >> 3);
-	z1dx = (projections[z1].dx >> 3);
+	z0px = (projections[z0].px * 2);
+	z1px = (projections[z1].px * 2);
+	z0dx = ((projections[z0].dx * 2) >> 3);
+	z1dx = ((projections[z1].dx * 2) >> 3);
 
 	px0z0 = z0px - ((x0) * z0dx);
 	px0z1 = z1px - ((x0) * z1dx);
@@ -210,7 +209,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 	py0z0 = z0py - ((y0) * z0dy);
 	py1z0 = py0z0 - (dY * z0dy);
 	py0z1 = z1py - ((y0) * z1dy);
-	py1z1 = py0z1 - (dY * z1dy);
+
 
 	drawContour = (py0z0 != py1z0 );
 
@@ -233,23 +232,23 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 #endif
 
 	if (!low) {
-		int x, x0, x1;
+		int16_t x, x0, x1;
 
 		if (drawContour ) {
 			if (IN_RANGE(0, 255, px0z0) && stencilHigh[px0z0] < py0z0 ) {
-				vLine(px0z0, py0z0, stencilHigh[px0z0] + 1, 5);
+				vLine(px0z0, py0z0, stencilHigh[px0z0] + 1, colour);
 			}
 
 			if (IN_RANGE(0, 255, px1z0) && stencilHigh[px1z0] < py0z0) {
-				vLine(px1z0, py0z0, stencilHigh[px1z0] + 1, 5);
+				vLine(px1z0, py0z0, stencilHigh[px1z0] + 1, colour);
 			}
 
 			if (IN_RANGE(0, 255, px0z1) && px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
-				vLine(px0z1, py0z1, stencilHigh[px0z1] + 1, 5);
+				vLine(px0z1, py0z1, stencilHigh[px0z1] + 1, colour);
 			}
 
 			if (IN_RANGE(0, 255, px1z1) && px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
-				vLine(px1z1, py0z1, stencilHigh[px1z1] + 1, 5);
+				vLine(px1z1, py0z1, stencilHigh[px1z1] + 1, colour);
 			}
 		}
 
@@ -260,22 +259,20 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 			for (x = px0z0; x < px1z0; ++x) {
 				if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z0) {
 #ifdef FILLED_POLYS
-					vLine(x, py0z0 + 1, stencilHigh[x] - 1, 5);
+					vLine(x, py0z0 + 1, stencilHigh[x] - 1, colour);
 #endif
 					if (drawContour) {
-						graphicsPut(x, py0z0, 5);
+						graphicsPut(x, py0z0, colour);
 					}
 					stencilHigh[x] = py0z0;
 				}
 			}
-		} else {
+		} else if (drawContour) {
             /* Ceiling is higher than the camera*/
             /* Let's just draw the nearer segment */
             for (x = px0z0; x < px1z0; ++x) {
                 if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z0) {
-                    if (drawContour) {
-                        graphicsPut(x, py0z0, 5);
-                    }
+                    graphicsPut(x, py0z0, colour);
                 }
             }
 		}
@@ -287,22 +284,20 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
 		if (x0 != x1) {
 			{
-				int y0 = py0z0;
-				int y1 = py0z1;
-				int dx = abs(x1 - x0);
-				int sx = x0 < x1 ? 1 : -1;
-				int dy = -abs(y1 - y0);
-				int sy = y0 < y1 ? 1 : -1;
-				int err = dx + dy;  /* error value e_xy */
-				int e2;
+				int8_t y0 = py0z0;
+				int8_t y1 = py0z1;
+				int8_t dx = abs(x1 - x0);
+				int8_t sx = x0 < x1 ? 1 : -1;
+				int8_t dy = -abs(y1 - y0);
+				int8_t sy = y0 < y1 ? 1 : -1;
+				int8_t err = dx + dy;  /* error value e_xy */
+				int8_t e2;
 
 				while ((x0 != x1 || y0 != y1)) {
 
                     if (IN_RANGE(0, 255, x0)  ) {
-                        if (py0z0 < py0z1) {
-                            if (drawContour) {
-                                graphicsPut(x0, stencilHigh[x0], 5);
-                            }
+                        if (drawContour && py0z0 < py0z1) {
+                            graphicsPut(x0, stencilHigh[x0], colour);
                         }
 
                         if (stencilHigh[x0] < y0) {
@@ -310,13 +305,12 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
                             vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
 #endif
                             if (drawContour) {
-                                graphicsPut(x0, y0, 5);
+                                graphicsPut(x0, y0, colour);
+                                graphicsPut(x0, stencilHigh[x0] + 1, colour);
                             }
                             stencilHigh[x0] = y0;
                         }
                     }
-
-
 
 					/* loop */
 					e2 = 2 * err;
@@ -343,14 +337,14 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 		if (x0 != x1) {
 
 			{
-				int y0 = py0z0;
-				int y1 = py0z1;
-				int dx = abs(x1 - x0);
-				int sx = x0 < x1 ? 1 : -1;
-				int dy = -abs(y1 - y0);
-				int sy = y0 < y1 ? 1 : -1;
-				int err = dx + dy;  /* error value e_xy */
-				int e2;
+				int8_t y0 = py0z0;
+				int8_t y1 = py0z1;
+				int8_t dx = abs(x1 - x0);
+				int8_t sx = x0 < x1 ? 1 : -1;
+				int8_t dy = -abs(y1 - y0);
+				int8_t sy = y0 < y1 ? 1 : -1;
+				int8_t err = dx + dy;  /* error value e_xy */
+				int8_t e2;
 				while ((x0 != x1 || y0 != y1)) {
 
 					if (IN_RANGE(0, 255, x0) && stencilHigh[x0] < y0) {
@@ -358,7 +352,8 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 						vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
 #endif
 						if (drawContour) {
-							graphicsPut(x0, y0, 5);
+							graphicsPut(x0, y0, colour);
+                            graphicsPut(x0, stencilHigh[x0] + 1, colour);
 						}
 						stencilHigh[x0] = y0;
 					}
@@ -390,191 +385,38 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
             for (x = px0z1; x <= px1z1; ++x) {
                 if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z1) {
 #ifdef FILLED_POLYS
-                    vLine(x, py0z1 + 1, stencilHigh[x] - 1, 5);
+                    vLine(x, py0z1 + 1, stencilHigh[x] - 1, colour);
 #endif
                     if (drawContour) {
-                        graphicsPut(x, py0z1, 5);
+                        graphicsPut(x, py0z1, colour);
                     }
                     stencilHigh[x] = py0z1;
                 }
             }
         }
-
-
-
-	} else { /* ------------ LOW area ------------ */
-
-		int x, x0, x1;
-
-		if (drawContour ) {
-			if (IN_RANGE(0, 255, px0z0) && stencilLow[px0z0] > py1z0) {
-				vLine(px0z0, py1z0, stencilLow[px0z0] - 1, 5);
-			}
-
-			if (IN_RANGE(0, 255, px1z0) && stencilLow[px1z0] > py1z0) {
-				vLine(px1z0, py1z0, stencilLow[px1z0] - 1, 5);
-			}
-
-			if (IN_RANGE(0, 255, px0z1) && px0z1 < px0z0 && py1z1 < stencilLow[px0z1]) {
-				vLine(px0z1, py1z1, stencilLow[px0z1] - 1, 5);
-			}
-
-			if (IN_RANGE(0, 255, px1z1) && px1z1 > px1z0 && py1z1 < stencilLow[px1z1]) {
-				vLine(px1z1, py1z1, stencilLow[px1z1] - 1, 5);
-			}
-		}
-
-		if (py1z0 > py1z1) {
-			for (x = px0z1; x < px1z1; ++x) {
-				if (IN_RANGE(0, 255, x) && stencilLow[x] > py1z1) {
-					if (drawContour) {
-#ifdef FILLED_POLYS
-						vLine(x, py1z1 + 1, stencilLow[x] - 1, 5);
-#endif
-						graphicsPut(x, py1z1, 5);
-					}
-
-					stencilLow[x] = py1z1;
-				}
-			}
-		} else {
-			for (x = px0z0; x < px1z0; ++x) {
-				if (IN_RANGE(0, 255, x) && stencilLow[x] > py1z0) {
-					if (drawContour) {
-#ifdef FILLED_POLYS
-						vLine(x, py1z0 + 1, stencilLow[x] - 1, 5);
-#endif
-						graphicsPut(x, py1z0, 5);
-					}
-					stencilLow[x] = py1z0;
-				}
-			}
-		}
-
-		x0 = px0z0;
-		x1 = px0z1;
-
-		if (x0 != x1) {
-
-
-			{
-				int y0 = py1z0;
-				int y1 = py1z1;
-				int dx = abs(x1 - x0);
-				int sx = x0 < x1 ? 1 : -1;
-				int dy = -abs(y1 - y0);
-				int sy = y0 < y1 ? 1 : -1;
-				int err = dx + dy;  /* error value e_xy */
-				int e2;
-				while ((x0 != x1 || y0 != y1)) {
-
-					if (IN_RANGE(0, 255, x0) && stencilLow[x0] > y0) {
-#ifdef FILLED_POLYS
-						vLine(x0, y0 + 1, stencilLow[x0] - 1, 5);
-#endif
-						if (drawContour) {
-							graphicsPut(x0, y0, 5);
-						}
-						stencilLow[x0] = y0;
-					}
-
-
-					/* loop */
-					e2 = 2 * err;
-
-					if (e2 >= dy) {
-						err += dy; /* e_xy+e_x > 0 */
-						x0 += sx;
-					}
-
-					if (e2 <= dx) {
-						/* e_xy+e_y < 0 */
-						err += dx;
-						y0 += sy;
-					}
-				}
-			}
-		}
-
-		x0 = px1z0;
-		x1 = px1z1;
-
-		if (x0 != x1) {
-
-			{
-				int y0 = py1z0;
-				int y1 = py1z1;
-				int dx = abs(x1 - x0);
-				int sx = x0 < x1 ? 1 : -1;
-				int dy = -abs(y1 - y0);
-				int sy = y0 < y1 ? 1 : -1;
-				int err = dx + dy;  /* error value e_xy */
-				int e2;
-				while ((x0 != x1 || y0 != y1)) {
-
-					if (IN_RANGE(0, 255, x0) && stencilLow[x0] > y0) {
-#ifdef FILLED_POLYS
-						vLine(x0, y0 + 1, stencilLow[x0] - 1, 5);
-#endif
-						if (drawContour) {
-							graphicsPut(x0, y0, 5);
-						}
-						stencilLow[x0] = y0;
-					}
-
-					/* loop */
-					e2 = 2 * err;
-
-					if (e2 >= dy) {
-						err += dy; /* e_xy+e_x > 0 */
-						x0 += sx;
-					}
-
-					if (e2 <= dx) {
-						/* e_xy+e_y < 0 */
-						err += dx;
-						y0 += sy;
-					}
-				}
-			}
-		}
 	}
 }
 
-void drawPattern(int pattern, int x0, int x1, int y, int cameraX, int cameraZ) {
+void drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y, uint8_t cameraX, uint8_t cameraZ) {
 
-	int diff;
-
-	diff = patterns[pattern].floor - patterns[0].floor;
-	//if (diff)
-	{
-		drawCubeAt(x0 - cameraX, patterns[0].floor, cameraZ - y, x1 - x0,
-				   diff, 1, 1, pattern);
-	}
-
+	int8_t diff;
 	diff = patterns[0].ceiling - patterns[pattern].ceiling;
-	//if (diff)
-
-	{
-		drawCubeAt(x0 - cameraX, patterns[pattern].ceiling, cameraZ - y, x1 - x0,
+	drawCubeAt(x0 - cameraX, patterns[pattern].ceiling, cameraZ - y, x1 - x0,
 				   diff, 1, 0, pattern);
-	}
 }
 
 int main(int argc, char **argv) {
-	int running = 1;
+	uint8_t running = 1;
 	int8_t x, y = 0;
-	int lastPattern, lastIndex;
-	int prevX;
-	int prevZ;
+	uint8_t lastPattern, lastIndex;
+	uint8_t prevX;
+	uint8_t prevZ;
 	cameraX = 5;
-	cameraY = 0;
 	cameraZ = 18;
-
-
+	
 	init();
-	memset(stencilLow, 0xFF, 64);
-	memset(stencilHigh, 0, 64);
+
+	memset(stencilHigh, 0, 128);
 
 
 	do {
@@ -604,20 +446,20 @@ int main(int argc, char **argv) {
 
 		clear();
 
-		vLine(64, 0, 127, 5);
+		vLine(128, 0, 127, 5);
 		vLine(0, 0, 127, 5);
-		hLine(0, 64, 0, 5);
-		hLine(0, 64, 127, 5);
+		hLine(0, 128, 0, 5);
+		hLine(0, 128, 127, 5);
 
 
 
-		for (int y = min(cameraZ - 3, 40); y >= max(cameraZ - 40, 0); --y) {
-			int x;
+		for (int8_t y = min(cameraZ - 3, 40); y >= max(cameraZ - 40, 0); --y) {
+			int8_t x;
 			lastIndex = cameraX;
 			lastPattern = map[y][lastIndex];
 
 			for (x = lastIndex; x < min(cameraX + 5 + ((cameraZ - 3) - y), 40); ++x) {
-				int pattern = map[y][x];
+				uint8_t pattern = map[y][x];
 
 				if (pattern != lastPattern ) {
 					if (lastPattern != 0) {
@@ -635,7 +477,7 @@ int main(int argc, char **argv) {
 			lastPattern = map[y][lastIndex];
 
 			for (x = lastIndex; x >= max(cameraX - 3 - ((cameraZ - 3) - y), 0); --x) {
-				int pattern = map[y][x];
+				uint8_t pattern = map[y][x];
 
 				if (pattern != lastPattern ) {
 					if (lastPattern != 0) {
@@ -656,8 +498,7 @@ int main(int argc, char **argv) {
 
 		graphicsFlush();
 
-		memset(stencilLow, 0xFF, 64);
-		memset(stencilHigh, 0, 64);
+		memset(stencilHigh, 0, 128);
 
 		waitkey:
 		switch (getKey()) {
