@@ -253,7 +253,10 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 			}
 		}
 
+		/* Draw the horizontal outlines of z0 and z1 */
+
 		if (py0z0 > py0z1) {
+		    /* Ceiling is lower than camera */
 			for (x = px0z0; x < px1z0; ++x) {
 				if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z0) {
 #ifdef FILLED_POLYS
@@ -266,18 +269,19 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 				}
 			}
 		} else {
-			for (x = px0z1; x < px1z1; ++x) {
-				if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z1) {
-#ifdef FILLED_POLYS
-					vLine(x, py0z1 + 1, stencilHigh[x] - 1, 5);
-#endif
-					if (drawContour) {
-						graphicsPut(x, py0z1, 5);
-					}
-					stencilHigh[x] = py0z1;
-				}
-			}
+            /* Ceiling is higher than the camera*/
+            /* Let's just draw the nearer segment */
+            for (x = px0z0; x < px1z0; ++x) {
+                if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z0) {
+                    if (drawContour) {
+                        graphicsPut(x, py0z0, 5);
+                    }
+                }
+            }
 		}
+
+
+		/* The left segment */
 		x0 = px0z0;
 		x1 = px0z1;
 
@@ -294,15 +298,25 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
 				while ((x0 != x1 || y0 != y1)) {
 
-					if (IN_RANGE(0, 255, x0) && stencilHigh[x0] < y0) {
+                    if (IN_RANGE(0, 255, x0)  ) {
+                        if (py0z0 < py0z1) {
+                            if (drawContour) {
+                                graphicsPut(x0, stencilHigh[x0], 5);
+                            }
+                        }
+
+                        if (stencilHigh[x0] < y0) {
 #ifdef FILLED_POLYS
-						vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
+                            vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
 #endif
-						if (drawContour) {
-							graphicsPut(x0, y0, 5);
-						}
-						stencilHigh[x0] = y0;
-					}
+                            if (drawContour) {
+                                graphicsPut(x0, y0, 5);
+                            }
+                            stencilHigh[x0] = y0;
+                        }
+                    }
+
+
 
 					/* loop */
 					e2 = 2 * err;
@@ -321,6 +335,8 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 			}
 		}
 
+
+		/* The right segment */
 		x0 = px1z0;
 		x1 = px1z1;
 
@@ -363,6 +379,27 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 				}
 			}
 		}
+
+
+        /* Draw the horizontal outlines of z0 and z1 */
+
+        if (py0z0 < py0z1) {
+            /* Ceiling is higher than the camera*/
+            /* Draw the last segment */
+
+            for (x = px0z1; x <= px1z1; ++x) {
+                if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z1) {
+#ifdef FILLED_POLYS
+                    vLine(x, py0z1 + 1, stencilHigh[x] - 1, 5);
+#endif
+                    if (drawContour) {
+                        graphicsPut(x, py0z1, 5);
+                    }
+                    stencilHigh[x] = py0z1;
+                }
+            }
+        }
+
 
 
 	} else { /* ------------ LOW area ------------ */
