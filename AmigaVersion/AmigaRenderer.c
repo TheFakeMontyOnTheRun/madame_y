@@ -255,7 +255,7 @@ void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
 		int err = dx + dy;  /* error value e_xy */
 
 		while (1) {
-			graphicsPut(x0, y0, colour);
+			framebuffer[ ( 320 * y0)  + (2 * x0) ] = colour;
 			/* loop */
 			if (x0 == x1 && y0 == y1) return;
 			int e2 = 2 * err;
