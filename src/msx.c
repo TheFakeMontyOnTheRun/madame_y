@@ -1,5 +1,5 @@
 #ifdef MSX
-
+#include <lib3d.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -7,83 +7,76 @@
 
 
 
-
 uint8_t getch();
 
 
-surface_t surface;
 unsigned char* sbuffer;
+surface_t surf;
 
-void fix_line (int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
-  surface_draw(&surface, x0, y0, x1, y1 );
+void fix_line (uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
+ // surface_draw(&surf, x0, y0, x1, y1 );
+ line( 2 * x0, y0, 2 * x1, y1 );
 }
-
 
 void shutdown() {
   // go back to text mode
   set_mode(mode_0);
 }
 
-void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
+void hLine(uint8_t x0, uint8_t x1, uint8_t y, uint8_t colour) {
 
-	if (y < 0 || y > 127 ) {
+	if (y > 127 ) {
 		return;
 	}
 
-	if (x0 > x1 ) {
-		int16_t tmp = x0;
-		x0 = x1;
-		x1 = tmp;
+	if (x1 > 127 ) {
+		x1 = 127;
 	}
 
-	if (x0 < 0 ) {
-		x0 = 0;
+	if (x0 > 127 ) {
+		x0 = 127;
 	}
 
-	if (x1 > 255 ) {
-		x1 = 255;
-	}
+
 
 	fix_line(x0, y, x1, y, colour );
 }
 
-void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
-
-	if (x0 < 0 || x0 > 255 ) {
-		return;
-	}
-
-	if (y0 > y1 ) {
-		int16_t tmp = y0;
-		y0 = y1;
-		y1 = tmp;
-	}
-
-	if (y0 < 0 ) {
-		y0 = 0;
-	}
+void vLine(uint8_t x0, uint8_t y0, uint8_t y1, uint8_t colour) {
 
 	if (y1 > 127 ) {
 		y1 = 127;
 	}
 
+	if (y0 > 127 ) {
+		y0 = 127;
+	}
+
+
+	if (x0 > 127 ) {
+		return;
+	}
+
+
 	fix_line(x0, y0, x0, y1, colour );
 }
 
-void graphicsPut( int x, int y, uint8_t colour ) {
-	if (y < 0 || y > 127 ) {
+void graphicsPut( uint8_t x, uint8_t y, uint8_t colour ) {
+	if (y > 127 ) {
 		return;
 	}
 
-	if (x < 0 || x > 255 ) {
+	if (x > 127 ) {
 		return;
 	}
 
-  fix_line( x, y, x, y, 1);
+    pset( 2 * x, y );
+	pset( 2 * x + 1, y );
+    //fix_line( x, y, x, y, 1);
 }
 
 void clear() {
-   memset(sbuffer, 0, 32*128);  // [*]
+   set_mode(mode_2);
 }
 
 uint8_t getKey() {
@@ -91,14 +84,14 @@ uint8_t getKey() {
 }
 
 void init() {
-  sbuffer = (unsigned char*)malloc(MODE2_MAX);
-  surface.data.ram = sbuffer;
-  set_mode(mode_2);
-  msx_vfill(MODE2_ATTR, 0xf1, MODE2_MAX);
-  memset(sbuffer, 0, MODE2_MAX);  // [*]
+	sbuffer = (unsigned char*)malloc(MODE2_MAX);
+	surf.data.ram = sbuffer;
+	set_color(15, 1, 1);
+	set_mode(mode_2);
+	fill(MODE2_ATTR, 0xF1, MODE2_MAX);
 }
 
 void graphicsFlush() {
-  msx_vwrite_direct(sbuffer, 0, MODE2_MAX);
+  /* msx_vwrite_direct(sbuffer, 0, MODE2_MAX); */
 }
 #endif

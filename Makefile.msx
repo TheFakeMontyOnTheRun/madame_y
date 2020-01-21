@@ -15,7 +15,7 @@ EXECFILES = $(CFILES:.c=.cas)
 all: beurette.rom
 
 beurette.rom: src/beurette.o src/msx.o src/FixP.o
-	$(CC) $(CFLAGS) -obeurette.bin src/beurette.c src/msx.c src/FixP.c -lmsxbios -subtype=rom
+	$(CC) $(CFLAGS) -obeurette.rom src/beurette.c src/msx.c -lmsxbios -subtype=rom
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *.bin zcc_opt.def *.reloc *.cas *.COM *.img ex8 *.rom
