@@ -212,14 +212,9 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
     fix_line( px0z0, py1z0, px1z0, py1z0, 4);
 
     fix_line( px0z1, py0z1, px1z1, py0z1, 4);
-    fix_line( px0z1, py0z1, px0z1, py1z1, 4);
-    fix_line( px1z1, py0z1, px1z1, py1z1, 4);
-    fix_line( px0z1, py1z1, px1z1, py1z1, 4);
 
     fix_line( px0z0, py0z0, px0z1, py0z1, 4);
     fix_line( px1z0, py0z0, px1z1, py0z1, 4);
-    fix_line( px0z0, py1z0, px0z1, py1z1, 4);
-    fix_line( px1z0, py1z0, px1z1, py1z1, 4);
     return;
 #endif
 
