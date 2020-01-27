@@ -416,10 +416,10 @@ int main(int argc, char **argv) {
     do {
         clear();
 
-        vLine(128, 0, 127, 5);
+        vLine(127, 0, 127, 5);
         vLine(0, 0, 127, 5);
-        hLine(0, 128, 0, 5);
-        hLine(0, 128, 127, 5);
+        hLine(0, 127, 0, 5);
+        hLine(0, 127, 127, 5);
 
 
         for (int8_t y = min(cameraZ - 3, 31); y >= max(cameraZ - 19, 0); --y) {
