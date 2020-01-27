@@ -240,7 +240,7 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y, uint8_t nColor) {
 #endif
 	unsigned char *pS;
 	unsigned char *base;
-    uint8_t nLine = 0;
+    uint8_t nLine = y;
     uint8_t nColumn = 0;
     uint8_t nPixel = 0;
 	uint8_t mask1 = 0;
