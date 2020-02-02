@@ -36,6 +36,15 @@ void graphicsFlush();
 #define REG(xn, parm) parm __asm(#xn)
 #define REGARGS __regargs
 
+#ifdef AGA5BPP
+extern void REGARGS c2p1x1_4_c5_bm(
+REG(d0, UWORD chunky_x),
+REG(d1, UWORD chunky_y),
+REG(d2, UWORD offset_x),
+REG(d3, UWORD offset_y),
+REG(a0, UBYTE *chunky_buffer),
+REG(a1, struct BitMap *bitmap));
+#else
 extern void REGARGS c2p1x1_8_c5_bm(
 REG(d0, UWORD chunky_x),
 REG(d1, UWORD chunky_y),
@@ -43,7 +52,7 @@ REG(d2, UWORD offset_x),
 REG(d3, UWORD offset_y),
 REG(a0, UBYTE *chunky_buffer),
 REG(a1, struct BitMap *bitmap));
-
+#endif
 struct IntuitionBase *IntuitionBase;
 struct GfxBase *GfxBase;
 extern struct ExecBase *SysBase;
@@ -484,6 +493,9 @@ void graphicsFlush() {
 	c2p1x1_8_c5_bm(320,200,0,0,&framebuffer[0], my_window->RPort->BitMap);
 	DisownBlitter();
 #else
-	WriteChunkyPixels(my_window->RPort, 0, 0, 319, 199, &framebuffer[0], 320);
+    OwnBlitter();
+    WaitBlit();
+    c2p1x1_4_c5_bm(320,200,0,0,&framebuffer[0], my_window->RPort->BitMap);
+    DisownBlitter();
 #endif
 }
