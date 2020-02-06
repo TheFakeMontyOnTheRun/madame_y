@@ -423,7 +423,7 @@ void graphicsPut(uint8_t nColumn, uint8_t nLine, uint8_t nColor) {
 	unsigned char nPixel = 0;
 	unsigned char nByte;
 
-	if (nColumn >= 128 || nLine >= 200 ) {
+	if (nColumn >= 128 || nLine >= 128 ) {
 		return;
 	}
 

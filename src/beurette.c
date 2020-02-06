@@ -182,7 +182,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
     px0z0 = z0px - ((x0) * z0dx);
     px0z1 = z1px - ((x0) * z1dx);
 
-    if ((px0z0 > 255) && (px0z1 > 255)) {
+    if ((px0z0 > 127) && (px0z1 > 127)) {
         return;
     }
 
@@ -243,8 +243,8 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
         if (py0z0 > py0z1) {
             /* Ceiling is lower than camera */
-            for (x = px0z0; x < px1z0; ++x) {
-                if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z0) {
+            for (x = px0z0; x <= px1z0; ++x) {
+                if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
 #ifdef FILLED_POLYS
                     vLine(x, py0z0 + 1, stencilHigh[x] - 1, colour);
 #endif
@@ -258,8 +258,8 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
         } else if (drawContour) {
             /* Ceiling is higher than the camera*/
             /* Let's just draw the nearer segment */
-            for (x = px0z0; x < px1z0; ++x) {
-                if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z0) {
+            for (x = px0z0; x <= px1z0; ++x) {
+                if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
                     graphicsPut(x, py0z0, colour);
                     graphicsPut(x, stencilHigh[x], colour);
                 }
@@ -271,7 +271,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
         x0 = px0z0;
         x1 = px0z1;
 
-        if (x0 != x1) {
+        if (x0 != x1 ) {
             {
                 int8_t y0 = py0z0;
                 int8_t y1 = py0z1;
@@ -284,7 +284,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
                 while ((x0 != x1 || y0 != y1)) {
 
-                    if (IN_RANGE(0, 255, x0)) {
+                    if (IN_RANGE(0, 127, x0)) {
                         if (drawContour && py0z0 < py0z1) {
                             graphicsPut(x0, stencilHigh[x0], colour);
                         }
@@ -295,7 +295,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 #endif
                             if (drawContour) {
                                 graphicsPut(x0, y0, colour);
-                                graphicsPut(x0, stencilHigh[x0] + 1, colour);
+                                graphicsPut(x0, stencilHigh[x0], colour);
                             }
                             stencilHigh[x0] = y0;
                         }
@@ -336,13 +336,13 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
                 int8_t e2;
                 while ((x0 != x1 || y0 != y1)) {
 
-                    if (IN_RANGE(0, 255, x0) && stencilHigh[x0] < y0) {
+                    if (IN_RANGE(0, 127, x0) && stencilHigh[x0] < y0) {
 #ifdef FILLED_POLYS
                         vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
 #endif
                         if (drawContour) {
                             graphicsPut(x0, y0, colour);
-                            graphicsPut(x0, stencilHigh[x0] + 1, colour);
+                            graphicsPut(x0, stencilHigh[x0], colour);
                         }
                         stencilHigh[x0] = y0;
                     }
@@ -372,7 +372,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
             /* Draw the last segment */
 
             for (x = px0z1; x <= px1z1; ++x) {
-                if (IN_RANGE(0, 255, x) && stencilHigh[x] < py0z1) {
+                if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
 #ifdef FILLED_POLYS
                     vLine(x, py0z1 + 1, stencilHigh[x] - 1, colour);
 #endif
@@ -410,11 +410,6 @@ int main(int argc, char **argv) {
 
     do {
         clear();
-
-        vLine(127, 0, 127, 5);
-        vLine(0, 0, 127, 5);
-        hLine(0, 127, 0, 5);
-        hLine(0, 127, 127, 5);
 
 
         for (int8_t y = min(cameraZ - 3, 31); y >= max(cameraZ - 19, 0); --y) {
@@ -457,10 +452,11 @@ int main(int argc, char **argv) {
 
         }
 
-        graphicsPut(cameraX, cameraZ, 16);
-
-
         graphicsFlush();
+        vLine(127, 0, 127, 5);
+        vLine(0, 0, 127, 5);
+        hLine(0, 127, 0, 5);
+        hLine(0, 127, 127, 5);
 
         memset(stencilHigh, 0, 128);
 
