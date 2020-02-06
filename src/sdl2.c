@@ -213,6 +213,7 @@ void init() {
 	int r, g, b;
 	mBufferedCommand = '.';
 	SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 	memset(framebuffer, 5, 160 * 200);
 	window =
 			SDL_CreateWindow("The Mistral Report", SDL_WINDOWPOS_CENTERED,
