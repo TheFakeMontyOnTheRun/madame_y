@@ -20,7 +20,7 @@ void graphicsFlush();
 void graphicsPut(uint8_t x, uint8_t y, uint8_t colour) {
 
 
-	if (x < 0 || x > 160 || y < 0 || y > 127) {
+	if (x < 0 || x > 127 || y < 0 || y > 127) {
 		return;
 	}
 
