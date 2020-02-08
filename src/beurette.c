@@ -225,21 +225,21 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
         if (drawContour) {
             if (elementMask & 2) {
-                if (IN_RANGE(0, 255, px0z0) && stencilHigh[px0z0] < py0z0) {
+                if (IN_RANGE(0, 127, px0z0) && stencilHigh[px0z0] < py0z0) {
                     vLine(px0z0, py0z0, stencilHigh[px0z0] + 1, colour);
                 }
 
-                if (IN_RANGE(0, 255, px1z0) && stencilHigh[px1z0] < py0z0) {
+                if (IN_RANGE(0, 127, px1z0) && stencilHigh[px1z0] < py0z0) {
                     vLine(px1z0, py0z0, stencilHigh[px1z0] + 1, colour);
                 }
             }
 
             if ( elementMask & 1 ) {
-                if (IN_RANGE(0, 255, px0z1) && px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
+                if (IN_RANGE(0, 127, px0z1) && px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
                     vLine(px0z1, py0z1, stencilHigh[px0z1] + 1, colour);
                 }
 
-                if (IN_RANGE(0, 255, px1z1) && px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
+                if (IN_RANGE(0, 127, px1z1) && px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
                     vLine(px1z1, py0z1, stencilHigh[px1z1] + 1, colour);
                 }
             }
