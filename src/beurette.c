@@ -46,9 +46,8 @@ struct Projection {
 
 
 struct Pattern {
-    int8_t ceiling;
-    int8_t floor;
-    uint8_t elementsMask;
+    int8_t ceiling : 4;
+    uint8_t elementsMask: 4;
 };
 
 const struct Projection projections[32] =
@@ -83,17 +82,17 @@ const struct Projection projections[32] =
                 {30, 66,  -9,   16}, // 26
         };
 
-const struct Pattern patterns[16] = {
-        {3,  -1, 3}, //0
-        {2,  0, 3}, // 1
-        {-1, -1, 0}, // 2
-        {-1,  -1, 3}, //3
-        {0,  -1, 3}, //4
-        {1,  2, 3}, //5
-        {2,  0, 3}, //6
-        {3,  -1, 3}, //7
-        {-1, -1, 1}, // 8
-        {-1, -1, 2}, // 9
+const struct Pattern patterns[10] = {
+        {4,  3}, //0
+        {2,  3}, // 1
+        {-1, 0}, // 2
+        {-1, 3}, //3
+        {0,  3}, //4
+        {1,  3}, //5
+        {2,  3}, //6
+        {4,  3}, //7
+        {-1, 1}, // 8
+        {-1, 2}, // 9
 };
 
 const int8_t map[32][32] = {
