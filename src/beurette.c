@@ -367,7 +367,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
         /* Draw the horizontal outlines of z0 and z1 */
 
-        if (py0z0 < py0z1) {
+        if (py0z0 <= py0z1) {
             /* Ceiling is higher than the camera*/
             /* Draw the last segment */
 
