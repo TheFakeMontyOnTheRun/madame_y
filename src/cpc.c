@@ -4,14 +4,10 @@
 #include <cpctelera.h>
 #include "FixP.h"
 
-#include "cpct_drw_mode0/cpct_drw_shared.h"
-#include "cpct_drw_mode0/cpct_drw_mode0.h"
-
 #define SCR_4000 (u8*)0x4000
 #define SCR_C000 (u8*)0xC000
 
 //#define DBL_BUFFER
-#define USE_FIXP_FOR_LINES
 
 u8 page;
 uint8_t* backBuffer;
@@ -63,12 +59,6 @@ void init() {
 	clear();
 #endif
 	page = 0;
-
-#ifndef USE_FIXP_FOR_LINES
-	cpct_drw_populateLineMasks_mode0();
-	cpct_drw_setLineColour_mode0(1);
-	cpct_drw_setClippingBox_mode0(0, 128, 0, 128);
-#endif
 }
 
 void graphicsFlush() {
@@ -114,7 +104,7 @@ void SetMode0PixelColor(unsigned char *pByteAddress, unsigned char nColor, unsig
 }
 
 void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
-#ifdef USE_FIXP_FOR_LINES
+
 	if (x0 == x1) {
 
         uint8_t _y0 = y0;
@@ -192,10 +182,6 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 			}
 		}
 	}
-#else
-	cpct_drw_setLineColour_mode0(colour);
-	cpct_drw_line_mode0(x0 / 2, y0, x1 / 2, y1);
-#endif
 }
 
 void graphicsFill(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
@@ -410,7 +396,6 @@ void writeStr( uint8_t nColumn, uint8_t nLine, char* str, uint8_t fg, uint8_t bg
 }
 
 void graphicsPut(uint8_t nColumn, uint8_t nLine, uint8_t nColor) {
-#ifdef USE_FIXP_FOR_LINES
 	uint8_t* pScreen = (uint8_t*)
 #ifdef DBL_BUFFER
 			backBuffer;
@@ -462,7 +447,4 @@ void graphicsPut(uint8_t nColumn, uint8_t nLine, uint8_t nColor) {
 	}
 
 	*pS = nByte;
-#else
-	fix_line(nColumn, nLine, nColumn, nLine, nColor);
-#endif
 }
