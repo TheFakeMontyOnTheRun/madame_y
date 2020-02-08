@@ -458,12 +458,11 @@ int main(int argc, char **argv) {
 
         }
 
-        graphicsFlush();
         vLine(127, 0, 127, 5);
         vLine(0, 0, 127, 5);
         hLine(0, 127, 0, 5);
         hLine(0, 127, 127, 5);
-
+        graphicsFlush();
         memset(stencilHigh, 0, 128);
 
         prevX = cameraX;
