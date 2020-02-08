@@ -273,10 +273,6 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
             while ((x0 != x1 || y0 != y1)) {
 
                 if (IN_RANGE(0, 127, x0)) {
-                    if (drawContour && py0z0 < py0z1) {
-                        graphicsPut(x0, stencilHigh[x0], colour);
-                    }
-
                     if (stencilHigh[x0] < y0) {
 #ifdef FILLED_POLYS
                         vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
