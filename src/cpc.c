@@ -73,7 +73,6 @@ void init() {
 
 void graphicsFlush() {
 #ifdef DBL_BUFFER
-	char buffer[32];
 	cpct_memcpy(SCR_C000, backBuffer, 80 * 200);
 #endif
 }
