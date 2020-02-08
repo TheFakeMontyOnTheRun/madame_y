@@ -276,49 +276,47 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
         x0 = px0z0;
         x1 = px0z1;
 
-        if (x0 != x1 ) {
-            {
-                int8_t y0 = py0z0;
-                int8_t y1 = py0z1;
-                int8_t dx = abs(x1 - x0);
-                int8_t sx = x0 < x1 ? 1 : -1;
-                int8_t dy = -abs(y1 - y0);
-                int8_t sy = y0 < y1 ? 1 : -1;
-                int8_t err = dx + dy;  /* error value e_xy */
-                int8_t e2;
+        if (x0 != x1) {
+            int8_t y0 = py0z0;
+            int8_t y1 = py0z1;
+            int8_t dx = abs(x1 - x0);
+            int8_t sx = x0 < x1 ? 1 : -1;
+            int8_t dy = -abs(y1 - y0);
+            int8_t sy = y0 < y1 ? 1 : -1;
+            int8_t err = dx + dy;  /* error value e_xy */
+            int8_t e2;
 
-                while ((x0 != x1 || y0 != y1)) {
+            while ((x0 != x1 || y0 != y1)) {
 
-                    if (IN_RANGE(0, 127, x0)) {
-                        if (drawContour && py0z0 < py0z1) {
+                if (IN_RANGE(0, 127, x0)) {
+                    if (drawContour && py0z0 < py0z1) {
+                        graphicsPut(x0, stencilHigh[x0], colour);
+                    }
+
+                    if (stencilHigh[x0] < y0) {
+#ifdef FILLED_POLYS
+                        vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
+#endif
+                        if (drawContour) {
+                            graphicsPut(x0, y0, colour);
                             graphicsPut(x0, stencilHigh[x0], colour);
                         }
-
-                        if (stencilHigh[x0] < y0) {
-#ifdef FILLED_POLYS
-                            vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
-#endif
-                            if (drawContour) {
-                                graphicsPut(x0, y0, colour);
-                                graphicsPut(x0, stencilHigh[x0], colour);
-                            }
-                            stencilHigh[x0] = y0;
-                        }
+                        stencilHigh[x0] = y0;
                     }
+                }
 
-                    /* loop */
-                    e2 = 2 * err;
+                /* loop */
+                e2 = 2 * err;
 
-                    if (e2 >= dy) {
-                        err += dy; /* e_xy+e_x > 0 */
-                        x0 += sx;
-                    }
+                if (e2 >= dy) {
+                    err += dy; /* e_xy+e_x > 0 */
+                    x0 += sx;
+                }
 
-                    if (e2 <= dx) {
-                        /* e_xy+e_y < 0 */
-                        err += dx;
-                        y0 += sy;
-                    }
+                if (e2 <= dx) {
+                    /* e_xy+e_y < 0 */
+                    err += dx;
+                    y0 += sy;
                 }
             }
         }
@@ -329,42 +327,39 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
         x1 = px1z1;
 
         if (x0 != x1) {
+            int8_t y0 = py0z0;
+            int8_t y1 = py0z1;
+            int8_t dx = abs(x1 - x0);
+            int8_t sx = x0 < x1 ? 1 : -1;
+            int8_t dy = -abs(y1 - y0);
+            int8_t sy = y0 < y1 ? 1 : -1;
+            int8_t err = dx + dy;  /* error value e_xy */
+            int8_t e2;
+            while ((x0 != x1 || y0 != y1)) {
 
-            {
-                int8_t y0 = py0z0;
-                int8_t y1 = py0z1;
-                int8_t dx = abs(x1 - x0);
-                int8_t sx = x0 < x1 ? 1 : -1;
-                int8_t dy = -abs(y1 - y0);
-                int8_t sy = y0 < y1 ? 1 : -1;
-                int8_t err = dx + dy;  /* error value e_xy */
-                int8_t e2;
-                while ((x0 != x1 || y0 != y1)) {
-
-                    if (IN_RANGE(0, 127, x0) && stencilHigh[x0] < y0) {
+                if (IN_RANGE(0, 127, x0) && stencilHigh[x0] < y0) {
 #ifdef FILLED_POLYS
-                        vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
+                    vLine(x0, y0 + 1, stencilHigh[x0] - 1, 5);
 #endif
-                        if (drawContour) {
-                            graphicsPut(x0, y0, colour);
-                            graphicsPut(x0, stencilHigh[x0], colour);
-                        }
-                        stencilHigh[x0] = y0;
+                    if (drawContour) {
+                        graphicsPut(x0, y0, colour);
+                        graphicsPut(x0, stencilHigh[x0], colour);
                     }
+                    stencilHigh[x0] = y0;
+                }
 
-                    /* loop */
-                    e2 = 2 * err;
+                /* loop */
+                e2 = 2 * err;
 
-                    if (e2 >= dy) {
-                        err += dy; /* e_xy+e_x > 0 */
-                        x0 += sx;
-                    }
+                if (e2 >= dy) {
+                    err += dy; /* e_xy+e_x > 0 */
+                    x0 += sx;
+                }
 
-                    if (e2 <= dx) {
-                        /* e_xy+e_y < 0 */
-                        err += dx;
-                        y0 += sy;
-                    }
+                if (e2 <= dx) {
+                    /* e_xy+e_y < 0 */
+                    err += dx;
+                    y0 += sy;
                 }
             }
         }
