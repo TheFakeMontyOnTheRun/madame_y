@@ -41,7 +41,6 @@ struct Projection {
     uint8_t px;
     uint8_t py;
     int16_t dx;
-    int16_t dy;
 };
 
 
@@ -50,36 +49,25 @@ struct Pattern {
     uint8_t elementsMask: 4;
 };
 
-const struct Projection projections[32] =
+const struct Projection projections[16] =
         {
                 //                                   Z
-                {0,  128, -255, 512}, // 0
-                {0,  128, -255, 512}, // 1
-                {16, 96,  -127, 256}, // 2
-                {21, 85,  -85,  168}, // 3
-                {24, 80,  -63,  128}, // 4
-                {25, 77,  -51,  104}, // 5
-                {26, 75,  -43,  88},  // 6
-                {27, 73,  -37,  72},  // 7
-                {28, 72,  -31,  64},  // 8
-                {28, 71,  -29,  56},  // 9
-                {28, 70,  -25,  48},  // 10
-                {29, 70,  -23,  48},  // 11
-                {29, 69,  -21,  40}, // 12
-                {29, 69,  -19,  40}, // 13
-                {29, 69,  -19,  40}, // 14
-                {29, 68,  -17,  32}, // 15
-                {30, 68,  -15,  32}, // 16
-                {30, 68,  -15,  32}, // 17
-                {30, 68,  -15,  32}, // 18
-                {30, 67,  -13,  24}, // 19
-                {30, 67,  -13,  24}, // 20
-                {30, 67,  -13,  24}, // 21
-                {30, 67,  -11,  24}, // 22
-                {30, 67,  -11,  24}, // 23
-                {30, 67,  -11,  24}, // 24
-                {30, 67,  -11,  24}, // 25
-                {30, 66,  -9,   16}, // 26
+                {0,  127, -64}, // 0
+                {0,  127, -64}, // 1
+                {20, 106, -43}, // 2
+                {31, 95,  -32}, // 3
+                {37, 89,  -26}, // 4
+                {42, 84,  -21}, // 5
+                {45, 81,  -18},  // 6
+                {47, 79,  -16},  // 7
+                {49, 77,  -14},  // 8
+                {50, 76,  -13},  // 9
+                {51, 75,  -12},  // 10
+                {52, 74,  -11},  // 11
+                {53, 73,  -10}, // 12
+                {54, 72,  -9}, // 13
+                {54, 72,  -9}, // 14
+                {55, 71,  -8}, // 15
         };
 
 const struct Pattern patterns[10] = {
@@ -160,25 +148,21 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
     uint8_t drawContour;
 
-    if (colour == 3) {
-        colour = 3;
-    }
-
-    if (z0 >= 26) {
-        z0 = 26;
+    if (z0 >= 16) {
+        z0 = 15;
     }
 
     z1 = z0 + dZ;
 
-    if (z1 >= 26) {
-        z1 = 26;
+    if (z1 >= 16) {
+        z1 = 15;
     }
 
 
-    z0px = (projections[z0].px * 2);
-    z1px = (projections[z1].px * 2);
-    z0dx = ((projections[z0].dx * 2) >> 3);
-    z1dx = ((projections[z1].dx * 2) >> 3);
+    z0px = (projections[z0].px);
+    z1px = (projections[z1].px);
+    z0dx = ((projections[z0].dx));
+    z1dx = ((projections[z1].dx));
 
     px0z0 = z0px - ((x0) * z0dx);
     px0z1 = z1px - ((x0) * z1dx);
@@ -195,8 +179,8 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
     }
 
     z1py = (projections[z1].py);
-    z0dy = (projections[z0].dy >> 2);
-    z1dy = (projections[z1].dy >> 2);
+    z0dy = -z0dx;
+    z1dy = -z1dx;
     z0py = (projections[z0].py);
 
     py0z0 = z0py - ((y0) * z0dy);
