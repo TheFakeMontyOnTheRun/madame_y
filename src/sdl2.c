@@ -17,16 +17,16 @@ uint32_t palette[16];
 uint8_t framebuffer[160 * 200];
 void graphicsFlush();
 
-void graphicsPut(uint8_t x, uint8_t y, uint8_t colour) {
+void graphicsPut(uint8_t x, uint8_t y) {
 
 
 	if (x < 0 || x > 127 || y < 0 || y > 127) {
-		return;
+
 	}
 
 
 
-	framebuffer[(160 * y) + x] = colour;
+	framebuffer[(160 * y) + x] = 1;
 #ifdef PUTAFLIP
 	graphicsFlush();
 	SDL_Delay(100);
@@ -34,7 +34,7 @@ void graphicsPut(uint8_t x, uint8_t y, uint8_t colour) {
 }
 
 
-void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
+void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 
 	if (x0 == x1) {
 
@@ -48,11 +48,7 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 
 
 		for (int16_t y = _y0; y <= _y1; ++y) {
-			if (x0 < 0 || x0 >= 256 || y < 0 || y >= 128) {
-				continue;
-			}
-
-			graphicsPut(x0, y, colour);
+			graphicsPut(x0, y);
 		}
 		return;
 	}
@@ -67,11 +63,7 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 		}
 
 		for (int16_t x = _x0; x <= _x1; ++x) {
-			if (x < 0 || x >= 256 || y0 < 0 || y0 >= 128) {
-				continue;
-			}
-
-			graphicsPut(x, y0, colour);
+			graphicsPut(x, y0);
 		}
 		return;
 	}
@@ -97,7 +89,7 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 		int err = dx + dy;  /* error value e_xy */
 
 		while (1) {
-			graphicsPut(x0, y0, colour);
+			graphicsPut(x0, y0);
 			/* loop */
 			if (x0 == x1 && y0 == y1) return;
 			int e2 = 2 * err;
@@ -116,17 +108,12 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
 	}
 }
 
-void hLine(uint8_t x0, uint8_t x1, uint8_t y, uint8_t colour) {
-	fix_line(x0, y, x1, y, colour );
+void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
+	fix_line(x0, y, x1, y );
 }
 
-void vLine(uint8_t x0, uint8_t y0, uint8_t y1, uint8_t colour) {
-	fix_line(x0, y0, x0, y1, colour );
-}
-
-
-void graphicsFill(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
-
+void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
+	fix_line(x0, y0, x0, y1);
 }
 
 
@@ -160,12 +147,13 @@ uint8_t getKey() {
 			switch (event.key.keysym.sym) {
 				case SDLK_RETURN:
 				case SDLK_z:
+                    mBufferedCommand = 'a';
 					break;
 
 				case SDLK_ESCAPE:
-				case SDLK_q:
-					mBufferedCommand = 'q';
-					break;
+                case SDLK_q:
+                    mBufferedCommand = 'l';
+                    break;
 
 				case SDLK_SPACE:
 				case SDLK_s:
@@ -181,6 +169,7 @@ uint8_t getKey() {
 				case SDLK_k:
 					break;
 				case SDLK_x:
+                    mBufferedCommand = 'd';
 					break;
 				case SDLK_c:
 					break;
@@ -188,10 +177,10 @@ uint8_t getKey() {
 					break;
 
 				case SDLK_LEFT:
-					mBufferedCommand = 'a';
+					mBufferedCommand = 'q';
 					break;
 				case SDLK_RIGHT:
-					mBufferedCommand = 'd';
+					mBufferedCommand = 'e';
 					break;
 				case SDLK_UP:
 					mBufferedCommand = 'w';

@@ -9,14 +9,13 @@ include_directories( src
 		${SDL2_INCLUDE_DIR}
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDLSW -std=c90 -W -pedantic -Wall")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDLSW -std=c90 -W -g -pedantic -Wall")
 
 find_package(SDL2 REQUIRED)
 
 add_executable(madame_y
 		src/beurette.c
 		src/sdl2.c
-		src/FixP.c
 		)
 
 
