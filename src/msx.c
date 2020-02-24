@@ -13,9 +13,9 @@ uint8_t getch();
 unsigned char* sbuffer;
 surface_t surf;
 
-void fix_line (uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t colour) {
+void fix_line (uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
  // surface_draw(&surf, x0, y0, x1, y1 );
- line( 2 * x0, y0, 2 * x1, y1 );
+ line( x0, y0, x1, y1 );
 }
 
 void shutdown() {
@@ -23,7 +23,7 @@ void shutdown() {
   set_mode(mode_0);
 }
 
-void hLine(uint8_t x0, uint8_t x1, uint8_t y, uint8_t colour) {
+void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 
 	if (y > 127 ) {
 		return;
@@ -38,11 +38,10 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y, uint8_t colour) {
 	}
 
 
-
-	fix_line(x0, y, x1, y, colour );
+	fix_line(x0, y, x1, y );
 }
 
-void vLine(uint8_t x0, uint8_t y0, uint8_t y1, uint8_t colour) {
+void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 
 	if (y1 > 127 ) {
 		y1 = 127;
@@ -52,16 +51,14 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1, uint8_t colour) {
 		y0 = 127;
 	}
 
-
 	if (x0 > 127 ) {
 		return;
 	}
 
-
-	fix_line(x0, y0, x0, y1, colour );
+	fix_line(x0, y0, x0, y1 );
 }
 
-void graphicsPut( uint8_t x, uint8_t y, uint8_t colour ) {
+void graphicsPut( uint8_t x, uint8_t y) {
 	if (y > 127 ) {
 		return;
 	}
@@ -70,8 +67,7 @@ void graphicsPut( uint8_t x, uint8_t y, uint8_t colour ) {
 		return;
 	}
 
-    pset( 2 * x, y );
-	pset( 2 * x + 1, y );
+    pset( x, y );
     //fix_line( x, y, x, y, 1);
 }
 
