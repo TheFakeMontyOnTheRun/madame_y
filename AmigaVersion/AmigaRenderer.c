@@ -197,7 +197,8 @@ int xlate_key (UWORD rawkey, UWORD qualifier, APTR eventptr)
 
 void graphicsPut(int x, int y, int colour) {
 	x = x * 2;
-	framebuffer[ ( 320 * y)  +x ] = colour;
+	framebuffer[ ( 320 * y)  + x ] = colour;
+	framebuffer[ ( 320 * y)  + x + 1] = colour;
 }
 
 
