@@ -244,7 +244,7 @@ void writeStr( uint8_t nColumn, uint8_t nLine, char* str, uint8_t fg, uint8_t bg
 
 	pS =  ((unsigned char *) pS + ((nLine >> 3) * 80) + ((nLine & 7) << 11)) + (nColumn >> 1);
 
-	cpct_drawStringM0(str, pS, fg, bg );
+	cpct_drawStringM0(str, pS );
 }
 
 void graphicsPut(uint8_t nColumn, uint8_t nLine) {
