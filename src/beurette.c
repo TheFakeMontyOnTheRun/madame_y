@@ -150,11 +150,11 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
 
     z1 = z0 + dZ;
 
-    if (z0 <= 3) {
+    if (z0 <= 2) {
         return;
     }
 
-    if (z1 <= 3) {
+    if (z1 <= 2) {
         return;
     }
 
