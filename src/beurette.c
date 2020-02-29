@@ -576,8 +576,8 @@ void renderScene() {
                         if (lastPattern != 0) {
                             drawPattern(lastPattern, lastIndex - cameraX, x - cameraX, cameraZ - y);
                             lastIndex = x;
-                            lastPattern = pattern;
                         }
+                        lastPattern = pattern;
                     }
                 }
                 if (lastPattern != 0) {
@@ -595,8 +595,8 @@ void renderScene() {
                         if (lastPattern != 0) {
                             drawPattern(lastPattern, x + 1 - cameraX, lastIndex + 1 - cameraX, cameraZ - y);
                             lastIndex = x;
-                            lastPattern = pattern;
                         }
+                        lastPattern = pattern;
                     }
                 }
                 if (lastPattern != 0) {
