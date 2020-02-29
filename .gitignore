@@ -50,3 +50,13 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+beurette.cdt
+beurette.dsk
+beurette.rom
+beurette_BSS.bin
+beurette_DATA.bin
+madame_y
+madame_y.cbp
+zcc_opt.def
+cfg/cdt_manager.mk
+cfg/compression.mk
