@@ -3,26 +3,29 @@
 
 #include "FixP.h"
 
-
+#if defined(MSX) || defined(SDLSW)
 uint8_t kIntegerPart = 8;
+#else
+uint8_t kIntegerPart = 8;
+#endif
 
 
-int16_t
+FixInt_t
 fixToInt( FixP_t fp) {
 	return fp >> kIntegerPart;
 }
 
 FixP_t intToFix(
-		
-		int16_t
+
+		FixInt_t
 		v ) {
 	return v << kIntegerPart;
 }
 
 FixP_t Mul( FixP_t v1,  FixP_t v2) {
-  return ((v1 >> 3) * (v2 >> 3)) >> 2;
+  return ((v1 ) * (v2)) >> (kIntegerPart );
 }
 
 FixP_t Div( FixP_t v1,  FixP_t v2) {
-  return (((int32_t)v1) * (1 << kIntegerPart)) / v2;
+  return (((FixIntDbl_t)v1) * (1 << kIntegerPart)) / v2;
 }
