@@ -12,14 +12,8 @@ uint8_t* backBuffer;
 void shutdown() {
 }
 
+void clear();
 
-void clear() {
-#ifdef DBL_BUFFER
-	cpct_memset_f64(backBuffer, 0, 80 * 200);
-#else
-	cpct_memset_f64((uint8_t*)0xC000, 0, 80 * 200);
-#endif
-}
 
 void graphicsPut(uint8_t nColumn, uint8_t nLine);
 
@@ -270,4 +264,20 @@ void graphicsPut(uint8_t nColumn, uint8_t nLine) {
     }
 
 	*pS = nByte;
+}
+
+void clear() {
+#ifdef DBL_BUFFER
+    cpct_memset_f64(backBuffer, 0, 80 * 200);
+#else
+    for ( int y = 1; y < 127; ++y) {
+        uint8_t* pScreen = (uint8_t*)0xC000;
+        unsigned char *pS;
+        unsigned char *base;
+        uint8_t nLine = y;
+        uint8_t bytes;
+        base = ((unsigned char *) pScreen + ((nLine >> 3) * 80) + ((nLine & 7) << 11));
+        cpct_memset_f64( base, 0x0, 64);
+    }
+#endif
 }
