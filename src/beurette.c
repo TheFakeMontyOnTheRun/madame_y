@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef CPCT_RELOCATABLE_AREA
+CPCT_ABSOLUTE_LOCATION_AREA(0x4000);
+#endif
 
 #define WEDGE_TYPE_NEAR_LEFT 4
 #define WEDGE_TYPE_NEAR_RIGHT 8
