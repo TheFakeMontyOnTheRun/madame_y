@@ -3,6 +3,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+#define WEDGE_TYPE_NEAR_LEFT 4
+#define WEDGE_TYPE_NEAR_RIGHT 8
+
+enum DIRECTION {
+    DIRECTION_N,
+    DIRECTION_E,
+    DIRECTION_S,
+    DIRECTION_W
+};
+
 #define IN_RANGE(V0, V1, V)  ((V0) <= (V) && (V) <= (V1))
 
 void shutdown();
@@ -179,7 +190,7 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
     }
 
 
-    if (type == 4) {
+    if (type == WEDGE_TYPE_NEAR_LEFT) {
         z0px = (projections[z0].px);
         z1px = (projections[z1].px);
         z0dx = ((projections[z0].dx));
@@ -584,12 +595,16 @@ void drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
                    diff, 1, patterns[pattern].elementsMask);
 
     } else {
-        if (cameraRotation == 1 || cameraRotation == 2) {
-            if (type == 4) {
-                type = 8;
-            } else {
-                type = 4;
-            }
+        switch( cameraRotation) {
+            case DIRECTION_W:
+            case DIRECTION_E:
+                if (type == WEDGE_TYPE_NEAR_LEFT) {
+                    type = WEDGE_TYPE_NEAR_RIGHT;
+                } else {
+                    type = WEDGE_TYPE_NEAR_LEFT;
+                }
+                break;
+
         }
 
         drawWedge(x0, patterns[pattern].ceiling, y, x1 - x0,
@@ -601,7 +616,7 @@ void renderScene() {
     uint8_t lastPattern, lastIndex;
 
     switch (cameraRotation) {
-        case 0: {
+        case DIRECTION_N: {
 
             int8_t limit = max(cameraZ - 19, 0);
             for (int8_t y = min(cameraZ - 3, 31); y >= limit; --y) {
@@ -648,7 +663,7 @@ void renderScene() {
         }
             break;
 
-        case 1: {
+        case DIRECTION_E: {
 
             for (int8_t x = min(cameraX + 3, 31); x <= min(cameraX + 19, 31); ++x) {
                 int8_t y;
@@ -665,7 +680,7 @@ void renderScene() {
         }
             break;
 
-        case 2: {
+        case DIRECTION_S: {
 
             for (int8_t y = min(cameraZ + 3, 31); y <= min(cameraZ + 19, 31); ++y) {
                 int8_t x;
@@ -680,7 +695,7 @@ void renderScene() {
         }
             break;
 
-        case 3: {
+        case DIRECTION_W: {
 
             for (int8_t x = max(cameraX - 3, 0); x >= max(cameraX - 19, 0); --x) {
                 int8_t y;
