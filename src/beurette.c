@@ -44,7 +44,7 @@ struct Pattern {
     uint8_t geometryType;
 };
 
-const struct Projection projections[16] =
+const struct Projection projections[32] =
         {
                 //                                   Z
                 {0,  127, -64}, // 0
@@ -63,6 +63,22 @@ const struct Projection projections[16] =
                 {54, 72,  -9}, // 13
                 {54, 72,  -9}, // 14
                 {55, 71,  -8}, // 15
+                {55, 71,  -8}, // 16
+                {56, 71,  -8}, // 17
+                {56, 70,  -7}, // 18
+                {57, 70,  -7}, // 19
+                {57, 69,  -6}, // 20
+                {57, 69,  -6}, // 21
+                {57, 69,  -6},  // 22
+                {58, 69,  -6},  // 23
+                {58, 68,  -5},  // 24
+                {58, 68,  -5},  // 25
+                {58, 68,  -5},  // 26
+                {58, 68,  -5},  // 27
+                {59, 67,  -5}, // 28
+                {59, 67,  -4}, // 29
+                {59, 67,  -4}, // 30
+                {59, 67,  -4}, // 31
         };
 
 const struct Pattern patterns[16] = {
@@ -144,8 +160,8 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
 
     uint8_t drawContour;
 
-    if (z0 >= 16) {
-        z0 = 15;
+    if (z0 >= 32) {
+        z0 = 31;
     }
 
     z1 = z0 + dZ;
@@ -158,8 +174,8 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
         return;
     }
 
-    if (z1 >= 16) {
-        z1 = 15;
+    if (z1 >= 32) {
+        z1 = 31;
     }
 
 
@@ -180,6 +196,7 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
 
         py1z0 = z0py + ((y0 + dY) * z0dx);
         py1z1 = z1py + ((y0 + dY) * z1dx);
+
     } else {
         z0px = (projections[z1].px);
         z1px = (projections[z0].px);
@@ -350,14 +367,14 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
 
     uint8_t drawContour;
 
-    if (z0 >= 16) {
-        z0 = 15;
+    if (z0 >= 32) {
+        z0 = 31;
     }
 
     z1 = z0 + dZ;
 
-    if (z1 >= 16) {
-        z1 = 15;
+    if (z1 >= 32) {
+        z1 = 31;
     }
 
 
