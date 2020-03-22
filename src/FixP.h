@@ -12,14 +12,12 @@
 #endif
 
 
+FixInt_t fixToInt(FixP_t fp);
 
+FixP_t intToFix(FixInt_t v);
 
-FixInt_t fixToInt( FixP_t fp);
+FixP_t Mul(FixP_t v1, FixP_t v2);
 
-FixP_t intToFix( FixInt_t v);
-
-FixP_t Mul( FixP_t v1, FixP_t v2);
-
-FixP_t Div( FixP_t v1,  FixP_t v2);
+FixP_t Div(FixP_t v1, FixP_t v2);
 
 #endif

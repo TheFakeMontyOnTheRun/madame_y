@@ -230,7 +230,7 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
         py1z1 = z1py + ((y0 + dY) * z1dx);
     }
 
-    if (px1z1 < 0 || px0z0 > 127 ) {
+    if (px1z1 < 0 || px0z0 > 127) {
         return;
     }
 
@@ -300,7 +300,7 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
                     x0 += sx;
                 }
 
-                if ( x0 >= 128 ) {
+                if (x0 >= 128) {
                     goto done_upper_stroke;
                 }
 
@@ -347,7 +347,7 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
                     x0 += sx;
                 }
 
-                if ( x0 >= 128 ) {
+                if (x0 >= 128) {
                     return;
                 }
 
@@ -410,7 +410,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
     py1z0 = py0z0 + (dY * z0dx);
     py0z1 = z1py + ((y0) * z1dx);
 
-    if (px1z0 < 0 || px0z0 > 127 ) {
+    if (px1z0 < 0 || px0z0 > 127) {
         return;
     }
 
@@ -513,7 +513,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
                     x0 += sx;
                 }
 
-                if ( x0 >= 128 ) {
+                if (x0 >= 128) {
                     goto right_stroke;
                 }
 
@@ -559,7 +559,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
                     x0 += sx;
                 }
 
-                if ( x0 >= 128 ) {
+                if (x0 >= 128) {
                     goto final_stroke;
                 }
 

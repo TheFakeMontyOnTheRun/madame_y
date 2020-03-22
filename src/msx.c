@@ -25,47 +25,47 @@ void shutdown() {
 
 void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 
-	if (y > 127 ) {
-		return;
-	}
+    if (y > 127 ) {
+        return;
+    }
 
-	if (x1 > 127 ) {
-		x1 = 127;
-	}
+    if (x1 > 127 ) {
+        x1 = 127;
+    }
 
-	if (x0 > 127 ) {
-		x0 = 127;
-	}
+    if (x0 > 127 ) {
+        x0 = 127;
+    }
 
 
-	fix_line(x0, y, x1, y );
+    fix_line(x0, y, x1, y );
 }
 
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 
-	if (y1 > 127 ) {
-		y1 = 127;
-	}
+    if (y1 > 127 ) {
+        y1 = 127;
+    }
 
-	if (y0 > 127 ) {
-		y0 = 127;
-	}
+    if (y0 > 127 ) {
+        y0 = 127;
+    }
 
-	if (x0 > 127 ) {
-		return;
-	}
+    if (x0 > 127 ) {
+        return;
+    }
 
-	fix_line(x0, y0, x0, y1 );
+    fix_line(x0, y0, x0, y1 );
 }
 
 void graphicsPut( uint8_t x, uint8_t y) {
-	if (y > 127 ) {
-		return;
-	}
+    if (y > 127 ) {
+        return;
+    }
 
-	if (x > 127 ) {
-		return;
-	}
+    if (x > 127 ) {
+        return;
+    }
 
     pset( x, y );
     //fix_line( x, y, x, y, 1);
@@ -80,11 +80,11 @@ uint8_t getKey() {
 }
 
 void init() {
-	sbuffer = (unsigned char*)malloc(MODE2_MAX);
-	surf.data.ram = sbuffer;
-	set_color(15, 1, 1);
-	set_mode(mode_2);
-	fill(MODE2_ATTR, 0xF1, MODE2_MAX);
+    sbuffer = (unsigned char*)malloc(MODE2_MAX);
+    surf.data.ram = sbuffer;
+    set_color(15, 1, 1);
+    set_mode(mode_2);
+    fill(MODE2_ATTR, 0xF1, MODE2_MAX);
 }
 
 void graphicsFlush() {
