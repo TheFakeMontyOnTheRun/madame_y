@@ -159,16 +159,27 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
     uint8_t nColumn = 0;
     uint8_t rest;
     uint8_t bytes;
-    base = ((unsigned char *) pScreen + ((nLine >> 3) * 80) + ((nLine & 7) << 11));
+    uint8_t dx = (x1 - x0);
+    bytes = dx >> 1;
+    base = ((unsigned char *) pScreen + ((nLine >> 3) * 80) + ((nLine & 7) << 11)) + (x0 >> 1);
 //write whole bytes first, then the remainder with masks
 
-    bytes = (x1 - x0) >> 1;
+    if (x0 & 1 ) {
+        graphicsPut( x0, nLine);
+        base++;
+        dx--;
+        bytes--;
+        x0++;
+    }
 
     memset(base, 0xFF, bytes);
 
-    for (nColumn = x0 + (bytes << 1); nColumn < x1; nColumn++) {
-        unsigned char nByte;
+    base += bytes;
+    dx -= (bytes << 1);
 
+    for (nColumn = 0; nColumn <= dx; nColumn++) {
+
+        unsigned char nByte;
         pS = base + (nColumn >> 1);
         nByte = *pS;
 
