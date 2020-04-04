@@ -5,6 +5,7 @@
 #include <cpctelera.h>
 #include "FixP.h"
 
+uint8_t frame = 0;
 
 void shutdown() {
 }
@@ -47,17 +48,25 @@ void init() {
     cpct_setVideoMode(0);
 
     cpct_memset_f64(0xC000, 0x0000, 80 * 200);
-#ifdef DBL_BUFFER
-    backBuffer = (uint8_t*)malloc(80 * 200);
-    clear();
+    cpct_memset_f64(0x8000, 0x0000, 80 * 200);
+    cpct_setVideoMemoryPage (cpct_pageC0);
+
+#ifndef MOVING_POINTERS
+    frame = 1;
 #endif
 }
 
 void graphicsFlush() {
-#ifdef DBL_BUFFER
-    cpct_memcpy(SCR_C000, backBuffer, 80 * 200);
+#ifdef MOVING_POINTERS
+    if (frame  ) {
+        cpct_setVideoMemoryPage (cpct_page80);
+        frame = 0;
+    } else {
+        cpct_setVideoMemoryPage(cpct_pageC0);
+        frame = 1;
+    }
 #else
-    cpct_memcpy(0xC000, 0x8000, 80 * 200);
+    memcpy(0xC000, 0x8000, 80 * 200);
 #endif
 }
 
@@ -143,12 +152,7 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 }
 
 void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
-    uint8_t *pScreen = (uint8_t *)
-#ifdef DBL_BUFFER
-            backBuffer;
-#else
-            0x8000;
-#endif
+    uint8_t *pScreen = (uint8_t *)( frame ) ? 0x8000 : 0xC000;
     unsigned char *pS;
     unsigned char *base;
     uint8_t nLine = y;
@@ -181,12 +185,7 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 }
 
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
-    uint8_t *pScreen = (uint8_t *)
-#ifdef DBL_BUFFER
-            backBuffer;
-#else
-            0x8000;
-#endif
+    uint8_t *pScreen = (uint8_t *)( frame ) ? 0x8000 : 0xC000;
 //odd lines
 //even lines
     unsigned char *pS;
@@ -222,12 +221,7 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 }
 
 void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg) {
-    unsigned char *pS = (uint8_t *)
-#ifdef DBL_BUFFER
-            backBuffer;
-#else
-            0x8000;
-#endif
+    unsigned char *pS = (uint8_t *)( frame ) ? 0x8000 : 0xC000;
     unsigned char nPixel = 0;
 
     if (nColumn >= 128 || nLine >= 200) {
@@ -241,13 +235,8 @@ void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg)
     cpct_drawStringM0(str, pS);
 }
 
-void graphicsPut(uint8_t nColumn, uint8_t nLine) {
-    uint8_t *pScreen = (uint8_t *)
-#ifdef DBL_BUFFER
-            backBuffer;
-#else
-            0x8000;
-#endif
+inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
+    uint8_t *pScreen = (uint8_t *)( frame ) ? 0x8000 : 0xC000;
 
     unsigned char *pS;
     unsigned char nByte = 0;
@@ -267,19 +256,12 @@ void graphicsPut(uint8_t nColumn, uint8_t nLine) {
 }
 
 void clear() {
-#ifdef DBL_BUFFER
-    cpct_memset_f64(backBuffer, 0, 80 * 200);
-#else
-    cpct_memset_f64(0x8000, 0, 80 * 200);
-    /*
-    for (int y = 1; y < 127; ++y) {
-        uint8_t *pScreen = (uint8_t *) 0x8000;
-        unsigned char *pS;
-        unsigned char *base;
-        uint8_t nLine = y;
-        uint8_t bytes;
-        base = ((unsigned char *) pScreen + ((nLine >> 3) * 80) + ((nLine & 7) << 11));
-        cpct_memset_f64(base, 0x0, 64);
-    }*/
-#endif
+    cpct_memset_f64(( frame ) ? 0x8000 : 0xC000, 0, 80 * 200);
 }
+
+
+//just to ensure nothing will leak into the back buffer
+uint8_t __at(0x8000) reserve[ 80 * 200];
+#ifdef MOVING_POINTERS
+uint8_t __at(0xC000) reserve2[ 80 * 200];
+#endif

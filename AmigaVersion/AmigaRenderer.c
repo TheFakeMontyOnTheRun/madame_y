@@ -194,112 +194,7 @@ int xlate_key(UWORD rawkey, UWORD qualifier, APTR eventptr) {
     }
 }
 
-void graphicsPut(int x, int y, int colour) {
-    x = x * 2;
-    framebuffer[(320 * y) + x] = colour;
-    framebuffer[(320 * y) + x + 1] = colour;
-}
 
-
-void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
-
-    if (x0 == x1) {
-
-        int16_t _y0 = y0;
-        int16_t _y1 = y1;
-
-        if (y0 > y1) {
-            _y0 = y1;
-            _y1 = y0;
-        }
-
-
-        for (int16_t y = _y0; y <= _y1; ++y) {
-            if (x0 < 0 || x0 >= 256 || y < 0 || y >= 128) {
-                continue;
-            }
-
-            graphicsPut(x0, y, colour);
-        }
-        return;
-    }
-
-    if (y0 == y1) {
-        int16_t _x0 = x0;
-        int16_t _x1 = x1;
-
-        if (x0 > x1) {
-            _x0 = x1;
-            _x1 = x0;
-        }
-
-        for (int16_t x = _x0; x <= _x1; ++x) {
-            if (x < 0 || x >= 256 || y0 < 0 || y0 >= 128) {
-                continue;
-            }
-
-            graphicsPut(x, y0, colour);
-        }
-        return;
-    }
-
-    //switching x0 with x1
-    if (x0 > x1) {
-        x0 = x0 + x1;
-        x1 = x0 - x1;
-        x0 = x0 - x1;
-
-        y0 = y0 + y1;
-        y1 = y0 - y1;
-        y0 = y0 - y1;
-    }
-
-    {
-        //https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-
-        int dx = abs(x1 - x0);
-        int sx = x0 < x1 ? 1 : -1;
-        int dy = -abs(y1 - y0);
-        int sy = y0 < y1 ? 1 : -1;
-        int err = dx + dy;  /* error value e_xy */
-
-        while (1) {
-            framebuffer[(320 * y0) + (2 * x0)] = colour;
-            /* loop */
-            if (x0 == x1 && y0 == y1) return;
-            int e2 = 2 * err;
-
-            if (e2 >= dy) {
-                err += dy; /* e_xy+e_x > 0 */
-                x0 += sx;
-            }
-
-            if (e2 <= dx) {
-                /* e_xy+e_y < 0 */
-                err += dx;
-                y0 += sy;
-            }
-        }
-    }
-}
-
-void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
-    fix_line(x0, y, x1, y, colour);
-}
-
-void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
-    fix_line(x0, y0, x0, y1, colour);
-}
-
-
-void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
-    for (int y = y0; y < y1; ++y) {
-        hLine(x0, x1, y, colour);
-    }
-}
-
-void fill(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
-}
 
 
 void shutdown() {
@@ -490,6 +385,143 @@ void init() {
 void flipRenderer() {
 
 }
+
+void graphicsPut(int x, int y ) {
+    x = x * 2;
+    framebuffer[(320 * y) + x] = 1;
+    framebuffer[(320 * y) + x + 1] = 1;
+}
+
+
+void fix_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
+
+    if (x0 == x1) {
+
+        int16_t _y0 = y0;
+        int16_t _y1 = y1;
+
+        if (y0 > y1) {
+            _y0 = y1;
+            _y1 = y0;
+        }
+
+
+        for (int16_t y = _y0; y <= _y1; ++y) {
+            if (x0 < 0 || x0 >= 256 || y < 0 || y >= 128) {
+            //    continue;
+            }
+
+            graphicsPut(x0, y );
+        }
+        return;
+    }
+
+    if (y0 == y1) {
+        int16_t _x0 = x0;
+        int16_t _x1 = x1;
+
+        if (x0 > x1) {
+            _x0 = x1;
+            _x1 = x0;
+        }
+
+        for (int16_t x = _x0; x <= _x1; ++x) {
+            if (x < 0 || x >= 256 || y0 < 0 || y0 >= 128) {
+             //   continue;
+            }
+
+            graphicsPut(x, y0 );
+        }
+        return;
+    }
+
+    //switching x0 with x1
+    if (x0 > x1) {
+        x0 = x0 + x1;
+        x1 = x0 - x1;
+        x0 = x0 - x1;
+
+        y0 = y0 + y1;
+        y1 = y0 - y1;
+        y0 = y0 - y1;
+    }
+
+    {
+        //https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+
+        int dx = abs(x1 - x0);
+        int sx = x0 < x1 ? 1 : -1;
+        int dy = -abs(y1 - y0);
+        int sy = y0 < y1 ? 1 : -1;
+        int err = dx + dy;  /* error value e_xy */
+
+        while (1) {
+            framebuffer[(320 * y0) + (2 * x0)] = colour;
+            /* loop */
+            if (x0 == x1 && y0 == y1) return;
+            int e2 = 2 * err;
+
+            if (e2 >= dy) {
+                err += dy; /* e_xy+e_x > 0 */
+                x0 += sx;
+            }
+
+            if (e2 <= dx) {
+                /* e_xy+e_y < 0 */
+                err += dx;
+                y0 += sy;
+            }
+        }
+    }
+}
+
+void hLine(int16_t x0, int16_t x1, int16_t y, uint8_t colour) {
+    fix_line(x0, y, x1, y, colour);
+}
+
+void vLine(int16_t x0, int16_t y0, int16_t y1, uint8_t colour) {
+    fix_line(x0, y0, x0, y1, colour);
+}
+
+
+
+void fill(
+        const int16_t x,
+        const int16_t y,
+        const int16_t dx,
+        const int16_t dy,
+        const uint8_t pixel,
+        const int stipple) {
+
+    uint8_t *destination = &framebuffer[0];
+    int16_t py;
+
+    for (py = 0; py < dy; ++py) {
+        uint8_t *destinationLineStart = destination + (320 * (y + py)) + x;
+
+        if (!stipple) {
+            memset (destinationLineStart, pixel, dx);
+        } else {
+            int16_t px;
+            for (px = 0; px < dx; ++px) {
+
+                destinationLineStart++;
+
+                if ((px + py) & 1) {
+                    //   *destinationLineStart = pixel;
+                }
+            }
+        }
+
+
+    }
+}
+
+
+void graphicsFill(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t colour) {
+    fill( x0, y0, x1 - x0, y1 - y0, colour, 0 );
+}
+
 
 void graphicsFlush() {
 #ifdef AGA8BPP

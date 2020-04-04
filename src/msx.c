@@ -23,6 +23,8 @@ void shutdown() {
   set_mode(mode_0);
 }
 
+void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg){}
+
 void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 
     if (y > 127 ) {

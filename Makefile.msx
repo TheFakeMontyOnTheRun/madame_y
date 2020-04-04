@@ -8,7 +8,7 @@
 
 CC = zcc
 
-CFLAGS = +msx -vn -llib3d  -lm -lndos -create-app -DAMALLOC -DMSX
+CFLAGS = +msx -vn -llib3d -lm -lndos -create-app -DAMALLOC -DMSX -O3 --opt-code-speed=all
 
 EXECFILES = $(CFILES:.c=.cas)
 
