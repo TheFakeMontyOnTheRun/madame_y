@@ -153,7 +153,7 @@ int8_t min(int8_t x1, int8_t x2) {
 }
 
 
-void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ, uint8_t elementMask, uint8_t type) {
+uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ, uint8_t elementMask, uint8_t type) {
 
     int16_t z1;
     int16_t z0px;
@@ -176,21 +176,21 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
     uint8_t drawContour;
 
     if (z0 >= 32) {
-        z0 = 31;
+        return 0;
     }
 
     z1 = z0 + dZ;
 
     if (z0 <= 2) {
-        return;
+        return 0;
     }
 
     if (z1 <= 2) {
-        return;
+        return 0;
     }
 
     if (z1 >= 32) {
-        z1 = 31;
+        return 0;
     }
 
 
@@ -232,7 +232,7 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
     }
 
     if (px1z1 < 0 || px0z0 > 127) {
-        return;
+        return 0;
     }
 
     drawContour = 1;
@@ -349,7 +349,7 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
                 }
 
                 if (x0 >= 128) {
-                    return;
+                    return 0;
                 }
 
                 if (e2 <= dx) {
@@ -360,9 +360,11 @@ void drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ,
             }
         }
     }
+
+    return 1;
 }
 
-void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ, uint8_t elementMask) {
+uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ, uint8_t elementMask) {
 
     int8_t z1;
     uint8_t z0px;
@@ -383,13 +385,13 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
     uint8_t drawContour;
 
     if (z0 >= 32) {
-        z0 = 31;
+        return 0;
     }
 
     z1 = z0 + dZ;
 
     if (z1 >= 32) {
-        z1 = 31;
+        return 0;
     }
 
 
@@ -412,7 +414,7 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
     py0z1 = z1py + ((y0) * z1dx);
 
     if (px1z0 < 0 || px0z0 > 127) {
-        return;
+        return 0;
     }
 
     drawContour = (dY);
@@ -577,25 +579,38 @@ void drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ
             /* Ceiling is higher than the camera*/
             /* Draw the last segment */
 
-            for (x = px0z1; x <= px1z1; ++x) {
-                if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
-                    if (drawContour) {
+            if (drawContour) {
+                for (x = px0z1; x <= px1z1; ++x) {
+                    if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
                         graphicsPut(x, py0z1);
+                        stencilHigh[x] = py0z1;
                     }
-                    stencilHigh[x] = py0z1;
+                }
+            } else {
+                for (x = px0z1; x <= px1z1; ++x) {
+                    if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
+                        stencilHigh[x] = py0z1;
+                    }
                 }
             }
         }
     }
+
+    return 1;
 }
 
-void drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
+
+uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 
     int8_t diff = patterns[0].ceiling - patterns[pattern].ceiling;
     uint8_t type = patterns[pattern].geometryType;
 
+    if (patterns[pattern].block) {
+        return 0;
+    }
+
     if (type == 0) {
-        drawCubeAt(x0, patterns[pattern].ceiling, y, x1 - x0,
+        return drawCubeAt(x0, patterns[pattern].ceiling, y, x1 - x0,
                    diff, 1, patterns[pattern].elementsMask);
 
     } else {
@@ -611,7 +626,7 @@ void drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 
         }
 
-        drawWedge(x0, patterns[pattern].ceiling, y, x1 - x0,
+        return drawWedge(x0, patterns[pattern].ceiling, y, x1 - x0,
                   diff, 1, patterns[pattern].elementsMask, type);
     }
 }
@@ -629,14 +644,16 @@ void renderScene() {
                 int8_t maxX = 0;
                 lastIndex = cameraX;
                 lastPattern = map[y][lastIndex];
-                for (x = lastIndex; x < minX; ++x) {
+                for (x = lastIndex; x < minX - 1; ++x) {
                     uint8_t pattern;
 
                     pattern = map[y][x];
 
                     if (pattern != lastPattern) {
                         if (lastPattern != 0) {
-                            drawPattern(lastPattern, lastIndex - cameraX, x - cameraX, cameraZ - y);
+                            if (!drawPattern(lastPattern, lastIndex - cameraX, x - cameraX, cameraZ - y)) {
+                                x = minX - 1;
+                            }
                             lastIndex = x;
                         }
                         lastPattern = pattern;
@@ -649,13 +666,17 @@ void renderScene() {
                 lastIndex = max(cameraX - 1, 0);
                 lastPattern = map[y][lastIndex];
                 maxX = max(cameraX - 3 - ((cameraZ - 3) - y), 0);
-                for (x = lastIndex; x >= maxX; --x) {
+                for (x = lastIndex; x >= maxX + 1; --x) {
                     uint8_t pattern;
                     pattern = map[y][x];
 
                     if (pattern != lastPattern) {
                         if (lastPattern != 0) {
-                            drawPattern(lastPattern, x + 1 - cameraX, lastIndex + 1 - cameraX, cameraZ - y);
+
+                            if (!drawPattern(lastPattern, x + 1 - cameraX, lastIndex + 1 - cameraX, cameraZ - y)) {
+                                x = maxX + 1;
+                            }
+
                             lastIndex = x;
                         }
                         lastPattern = pattern;
