@@ -59,6 +59,18 @@ struct Pattern {
     uint8_t block;
 };
 
+struct Point {
+    uint8_t x;
+    uint8_t z;
+};
+
+struct Sector {
+    struct Point p0;
+    struct Point p1;
+    uint8_t h0;
+    uint8_t h1;
+};
+
 const struct Projection projections[32] =
         {
                 //                                   Z
@@ -599,152 +611,265 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
     return 1;
 }
 
+uint8_t drawSector(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ ) {
 
-uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
+    int8_t z1;
+    uint8_t z0px;
+    uint8_t z0py;
+    uint8_t z1px;
+    uint8_t z1py;
+    int8_t z0dx;
+    int8_t z1dx;
 
-    int8_t diff = patterns[0].ceiling - patterns[pattern].ceiling;
-    uint8_t type = patterns[pattern].geometryType;
+    int16_t px0z0;
+    int8_t py0z0;
+    int16_t px1z0;
+    int8_t py1z0;
+    int16_t px0z1;
+    int8_t py0z1;
+    int16_t px1z1;
 
-    if (patterns[pattern].block) {
+    uint8_t drawContour;
+
+
+    z1 = z0 + dZ;
+
+
+
+    z0px = (projections[z0].px);
+    z1px = (projections[z1].px);
+    z0dx = ((projections[z0].dx));
+    z1dx = ((projections[z1].dx));
+
+    px0z0 = z0px - ((x0) * z0dx);
+    px0z1 = z1px - ((x0) * z1dx);
+
+    px1z0 = px0z0 - (dX * z0dx);
+    px1z1 = px0z1 - (dX * z1dx);
+
+    z1py = (projections[z1].py);
+    z0py = (projections[z0].py);
+
+    py0z0 = z0py + ((y0) * z0dx);
+    py1z0 = py0z0 + (dY * z0dx);
+    py0z1 = z1py + ((y0) * z1dx);
+
+    if (px1z0 < 0 || px0z0 > 127) {
         return 0;
     }
 
-    if (type == 0) {
-        return drawCubeAt(x0, patterns[pattern].ceiling, y, x1 - x0,
-                   diff, 1, patterns[pattern].elementsMask);
+    drawContour = (dY);
 
-    } else {
-        switch( cameraRotation) {
-            case DIRECTION_W:
-            case DIRECTION_E:
-                if (type == WEDGE_TYPE_NEAR_LEFT) {
-                    type = WEDGE_TYPE_NEAR_RIGHT;
-                } else {
-                    type = WEDGE_TYPE_NEAR_LEFT;
+    {
+        int16_t x, x0, x1;
+
+        if (drawContour) {
+                if (IN_RANGE(0, 127, px0z0) && stencilHigh[px0z0] < py0z0) {
+                    vLine(px0z0, py0z0, stencilHigh[px0z0]);
                 }
-                break;
 
+                if (IN_RANGE(0, 127, px1z0) && stencilHigh[px1z0] < py0z0) {
+                    vLine(px1z0, py0z0, stencilHigh[px1z0]);
+                }
+
+                if (IN_RANGE(0, 127, px0z1) && px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
+                    vLine(px0z1, py0z1, stencilHigh[px0z1]);
+                }
+
+                if (IN_RANGE(0, 127, px1z1) && px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
+                    vLine(px1z1, py0z1, stencilHigh[px1z1]);
+                }
         }
 
-        return drawWedge(x0, patterns[pattern].ceiling, y, x1 - x0,
-                  diff, 1, patterns[pattern].elementsMask, type);
+        /* Draw the horizontal outlines of z0 and z1 */
+
+        if (py0z0 > py0z1) {
+            /* Ceiling is lower than camera */
+            for (x = px0z0; x <= px1z0; ++x) {
+                if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
+                    if (drawContour) {
+                        graphicsPut(x, py0z0);
+                        graphicsPut(x, stencilHigh[x]);
+                    }
+                    stencilHigh[x] = py0z0;
+                }
+            }
+        } else if (drawContour) {
+            /* Ceiling is higher than the camera*/
+            /* Let's just draw the nearer segment */
+            for (x = px0z0; x <= px1z0; ++x) {
+                if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
+                    graphicsPut(x, py0z0);
+                    graphicsPut(x, stencilHigh[x]);
+                }
+            }
+        }
+
+
+        /* The left segment */
+        x0 = px0z0;
+        x1 = px0z1;
+
+        if (x0 != x1) {
+            int16_t y0 = py0z0;
+            int16_t y1 = py0z1;
+            int16_t dx = abs(x1 - x0);
+            int16_t sx = x0 < x1 ? 1 : -1;
+            int16_t dy = -abs(y1 - y0);
+            int16_t sy = y0 < y1 ? 1 : -1;
+            int16_t err = dx + dy;  /* error value e_xy */
+            int16_t e2;
+
+            while ((x0 != x1 || y0 != y1)) {
+
+                if (IN_RANGE(0, 127, x0)) {
+                    if (stencilHigh[x0] < y0) {
+                        if (drawContour) {
+                            graphicsPut(x0, y0);
+                            graphicsPut(x0, stencilHigh[x0]);
+                        }
+                        stencilHigh[x0] = y0;
+                    }
+                }
+
+                /* loop */
+                e2 = err << 2;
+
+                if (e2 >= dy) {
+                    err += dy; /* e_xy+e_x > 0 */
+                    x0 += sx;
+                }
+
+                if (x0 >= 128) {
+                    goto right_stroke;
+                }
+
+                if (e2 <= dx) {
+                    /* e_xy+e_y < 0 */
+                    err += dx;
+                    y0 += sy;
+                }
+            }
+        }
+
+        right_stroke:
+
+        /* The right segment */
+        x0 = px1z0;
+        x1 = px1z1;
+
+        if (x0 != x1) {
+            int16_t y0 = py0z0;
+            int16_t y1 = py0z1;
+            int16_t dx = abs(x1 - x0);
+            int16_t sx = x0 < x1 ? 1 : -1;
+            int16_t dy = -abs(y1 - y0);
+            int16_t sy = y0 < y1 ? 1 : -1;
+            int16_t err = dx + dy;  /* error value e_xy */
+            int16_t e2;
+
+            while ((x0 != x1 || y0 != y1)) {
+
+                if (IN_RANGE(0, 127, x0) && stencilHigh[x0] < y0) {
+                    if (drawContour) {
+                        graphicsPut(x0, y0);
+                        graphicsPut(x0, stencilHigh[x0]);
+                    }
+                    stencilHigh[x0] = y0;
+                }
+
+                /* loop */
+                e2 = err << 2;
+
+                if (e2 >= dy) {
+                    err += dy; /* e_xy+e_x > 0 */
+                    x0 += sx;
+                }
+
+                if (x0 >= 128) {
+                    goto final_stroke;
+                }
+
+                if (e2 <= dx) {
+                    /* e_xy+e_y < 0 */
+                    err += dx;
+                    y0 += sy;
+                }
+            }
+        }
+
+        final_stroke:
+        if (py0z0 <= py0z1) {
+            /* Ceiling is higher than the camera*/
+            /* Draw the last segment */
+
+            if (drawContour) {
+                for (x = px0z1; x <= px1z1; ++x) {
+                    if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
+                        graphicsPut(x, py0z1);
+                        stencilHigh[x] = py0z1;
+                    }
+                }
+            } else {
+                for (x = px0z1; x <= px1z1; ++x) {
+                    if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
+                        stencilHigh[x] = py0z1;
+                    }
+                }
+            }
+        }
     }
+
+    return 1;
+}
+
+
+uint8_t sectorsCount;
+struct Sector *sector;
+struct Sector sectors[4];
+
+void initSector( int index, int x0, int y0, int z0, int x1, int y1, int z1) {
+    sectors[index].p0.x = x0;
+    sectors[index].p0.z = z0;
+    sectors[index].p1.x = x1;
+    sectors[index].p1.z = z1;
+    sectors[index].h0 = y0;
+    sectors[index].h1 = y1;
+}
+
+void initSectors() {
+    sectorsCount = 4;
+    sectors[0].p0.x = 0;
+    sectors[0].p0.z = 0;
+    sectors[0].p1.x = 255;
+    sectors[0].p1.z = 255;
+    sectors[0].h0 = 0;
+    sectors[0].h1 = 255;
+
+    initSector(1, 20, -1, 14, 21, 1, 19 );
+    initSector(2, 20, 1, 15, 26, 2, 16 );
+    initSector(3, 20, -1, 13, 26, 1, 14 );
 }
 
 void renderScene() {
-    uint8_t lastPattern, lastIndex;
+    uint8_t s;
 
-    switch (cameraRotation) {
-        case DIRECTION_N: {
+    for (s = 1; s < sectorsCount; ++s) {
+        sector = &sectors[s];
 
-            int8_t limit = max(cameraZ - 19, 0);
-            for (int8_t y = min(cameraZ - 3, 31); y >= limit; --y) {
-                int8_t x;
-                int8_t minX =  min(cameraX + 5 + ((cameraZ - 3) - y), 31);
-                int8_t maxX = 0;
-                lastIndex = cameraX;
-                lastPattern = map[y][lastIndex];
-                for (x = lastIndex; x < minX - 1; ++x) {
-                    uint8_t pattern;
-
-                    pattern = map[y][x];
-
-                    if (pattern != lastPattern) {
-                        if (lastPattern != 0) {
-                            if (!drawPattern(lastPattern, lastIndex - cameraX, x - cameraX, cameraZ - y)) {
-                                x = minX - 1;
-                            }
-                            lastIndex = x;
-                        }
-                        lastPattern = pattern;
-                    }
-                }
-                if (lastPattern != 0) {
-                    drawPattern(lastPattern, lastIndex - cameraX, x - cameraX, cameraZ - y);
-                }
-
-                lastIndex = max(cameraX - 1, 0);
-                lastPattern = map[y][lastIndex];
-                maxX = max(cameraX - 3 - ((cameraZ - 3) - y), 0);
-                for (x = lastIndex; x >= maxX + 1; --x) {
-                    uint8_t pattern;
-                    pattern = map[y][x];
-
-                    if (pattern != lastPattern) {
-                        if (lastPattern != 0) {
-
-                            if (!drawPattern(lastPattern, x + 1 - cameraX, lastIndex + 1 - cameraX, cameraZ - y)) {
-                                x = maxX + 1;
-                            }
-
-                            lastIndex = x;
-                        }
-                        lastPattern = pattern;
-                    }
-                }
-                if (lastPattern != 0) {
-                    drawPattern(lastPattern, x + 1 - cameraX, lastIndex + 1 - cameraX, cameraZ - y);
-                }
-            }
-        }
-            break;
-
-        case DIRECTION_E: {
-
-            for (int8_t x = min(cameraX - 3, 31); x <= min(cameraX + 13, 31); ++x) {
-                int8_t y;
-
-                for (y = cameraZ; y <= min(cameraZ + (x - cameraX), 31); ++y) {
-                    drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, x - cameraX + 3);
-                }
-
-                for (y = max(cameraZ - 1, 0); y >= max(cameraZ - (x - cameraX), 0); --y) {
-                    drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, x - cameraX + 3);
-                }
-
-            }
-        }
-            break;
-
-        case DIRECTION_S: {
-
-            for (int8_t y = min(cameraZ + 3, 31); y <= min(cameraZ + 19, 31); ++y) {
-                int8_t x;
-                for (x = cameraX; x <= min(cameraX + (y - (cameraZ + 3)), 31); ++x) {
-                    drawPattern(map[y][x], cameraX - x, cameraX - x + 1, y - cameraZ);
-                }
-
-                for (x = max(cameraX - 1, 0); x >= max(cameraX - (y - (cameraZ + 3)), 0); --x) {
-                    drawPattern(map[y][x], cameraX - x, cameraX - x + 1, y - cameraZ);
-                }
-            }
-        }
-            break;
-
-        case DIRECTION_W: {
-
-            for (int8_t x = max(cameraX, 0); x >= max(cameraX - 16, 0); --x) {
-                int8_t y;
-                for (y = cameraZ; y <= min(cameraZ - (x - (cameraX)), 31); ++y) {
-                    drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, cameraX - x + 1);
-                }
-
-                for (y = max(cameraZ - 1, 0); y >= max(cameraZ + (x - (cameraX)), 0); --y) {
-                    drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, cameraX - x + 1);
-                }
-            }
-        }
-            break;
+        drawSector( sector->p0.x - cameraX, sector->h0,  cameraZ - sector->p0.z, sector->p1.x - sector->p0.x, sector->h1 - sector->h0, sector->p1.z - sector->p0.z );
     }
+
 }
 
 int main(int argc, char **argv) {
     uint8_t running = 1;
     uint8_t prevX;
     uint8_t prevZ;
-    cameraX = 5;
-    cameraZ = 15;
+    cameraX = 20;
+    cameraZ = 20;
     cameraRotation = 0;
+    initSectors();
     init();
 
     memset(stencilHigh, 0, 128);
@@ -813,11 +938,12 @@ int main(int argc, char **argv) {
         if (cameraX < 0) {
             cameraX = 0;
         }
-
+/*
         if (patterns[map[cameraZ - 2][cameraX]].ceiling < 2) {
             cameraX = prevX;
             cameraZ = prevZ;
         }
+        */
     } while (running);
 
     shutdown();
