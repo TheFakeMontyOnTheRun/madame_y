@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cpctelera.h>
-#include "FixP.h"
 
 uint8_t frame = 0;
 
