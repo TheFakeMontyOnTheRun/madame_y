@@ -49,7 +49,7 @@ void init() {
 
     cpct_memset_f64(0xC000, 0x0000, 80 * 200);
     cpct_memset_f64(0x8000, 0x0000, 80 * 200);
-    cpct_setVideoMemoryPage (cpct_pageC0);
+    cpct_setVideoMemoryPage(cpct_pageC0);
 
 #ifndef MOVING_POINTERS
     frame = 1;
@@ -152,7 +152,7 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 }
 
 void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
-    uint8_t *pScreen = (uint8_t *)( frame ) ? 0x8000 : 0xC000;
+    uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
     unsigned char *pS;
     unsigned char *base;
     uint8_t nLine = y;
@@ -164,8 +164,8 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
     base = ((unsigned char *) pScreen + ((nLine >> 3) * 80) + ((nLine & 7) << 11)) + (x0 >> 1);
 //write whole bytes first, then the remainder with masks
 
-    if (x0 & 1 ) {
-        graphicsPut( x0, nLine);
+    if (x0 & 1) {
+        graphicsPut(x0, nLine);
         base++;
         dx--;
         bytes--;
@@ -196,7 +196,7 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 }
 
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
-    uint8_t *pScreen = (uint8_t *)( frame ) ? 0x8000 : 0xC000;
+    uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
 //odd lines
 //even lines
     unsigned char *pS;
@@ -232,7 +232,7 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 }
 
 void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg) {
-    unsigned char *pS = (uint8_t *)( frame ) ? 0x8000 : 0xC000;
+    unsigned char *pS = (uint8_t *) (frame) ? 0x8000 : 0xC000;
     unsigned char nPixel = 0;
 
     if (nColumn >= 128 || nLine >= 200) {
@@ -247,7 +247,7 @@ void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg)
 }
 
 inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
-    uint8_t *pScreen = (uint8_t *)( frame ) ? 0x8000 : 0xC000;
+    uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
 
     unsigned char *pS;
     unsigned char nByte = 0;
@@ -267,12 +267,14 @@ inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
 }
 
 void clear() {
-    cpct_memset_f64(( frame ) ? 0x8000 : 0xC000, 0, 80 * 200);
+    cpct_memset_f64((frame) ? 0x8000 : 0xC000, 0, 80 * 200);
 }
 
 
 //just to ensure nothing will leak into the back buffer
-uint8_t __at(0x8000) reserve[ 80 * 200];
+uint8_t __at(
+
+0x8000) reserve[80 * 200];
 #ifdef MOVING_POINTERS
 uint8_t __at(0xC000) reserve2[ 80 * 200];
 #endif

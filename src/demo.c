@@ -611,10 +611,10 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 
     if (type == 0) {
         return drawCubeAt(x0, patterns[pattern].ceiling, y, x1 - x0,
-                   diff, 1, patterns[pattern].elementsMask);
+                          diff, 1, patterns[pattern].elementsMask);
 
     } else {
-        switch( cameraRotation) {
+        switch (cameraRotation) {
             case DIRECTION_W:
             case DIRECTION_E:
                 if (type == WEDGE_TYPE_NEAR_LEFT) {
@@ -627,7 +627,7 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
         }
 
         return drawWedge(x0, patterns[pattern].ceiling, y, x1 - x0,
-                  diff, 1, patterns[pattern].elementsMask, type);
+                         diff, 1, patterns[pattern].elementsMask, type);
     }
 }
 
@@ -640,7 +640,7 @@ void renderScene() {
             int8_t limit = max(cameraZ - 19, 0);
             for (int8_t y = min(cameraZ - 3, 31); y >= limit; --y) {
                 int8_t x;
-                int8_t minX =  min(cameraX + 5 + ((cameraZ - 3) - y), 31);
+                int8_t minX = min(cameraX + 5 + ((cameraZ - 3) - y), 31);
                 int8_t maxX = 0;
                 lastIndex = cameraX;
                 lastPattern = map[y][lastIndex];
