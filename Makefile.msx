@@ -12,10 +12,10 @@ CFLAGS = +msx -vn -llib3d -lm -lndos -create-app -DAMALLOC -DMSX -O3 --opt-code-
 
 EXECFILES = $(CFILES:.c=.cas)
 
-all: beurette.rom
+all: demo.rom
 
-beurette.rom: src/beurette.o src/msx.o src/FixP.o
-	$(CC) $(CFLAGS) -obeurette.rom src/beurette.c src/msx.c -lmsxbios -subtype=rom
+demo.rom: src/demo.o src/msx.o
+	$(CC) $(CFLAGS) -odemo.rom src/demo.c src/msx.c -lmsxbios -subtype=rom
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *.bin zcc_opt.def *.reloc *.cas *.COM *.img ex8 *.rom

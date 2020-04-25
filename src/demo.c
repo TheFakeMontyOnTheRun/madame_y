@@ -751,7 +751,9 @@ int main(int argc, char **argv) {
 
 
     do {
+#ifndef CPCT_RELOCATABLE_AREA
         clear();
+#endif
         renderScene();
 
         vLine(127, 0, 127);
@@ -761,6 +763,9 @@ int main(int argc, char **argv) {
 
         graphicsFlush();
         memset(stencilHigh, 0, 128);
+#ifdef CPCT_RELOCATABLE_AREA
+        clear();
+#endif
 
         prevX = cameraX;
         prevZ = cameraZ;

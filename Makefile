@@ -123,32 +123,32 @@ madame_y/fast:
 	$(MAKE) -f CMakeFiles/madame_y.dir/build.make CMakeFiles/madame_y.dir/build
 .PHONY : madame_y/fast
 
-src/beurette.o: src/beurette.c.o
+src/demo.o: src/demo.c.o
 
-.PHONY : src/beurette.o
+.PHONY : src/demo.o
 
 # target to build an object file
-src/beurette.c.o:
-	$(MAKE) -f CMakeFiles/madame_y.dir/build.make CMakeFiles/madame_y.dir/src/beurette.c.o
-.PHONY : src/beurette.c.o
+src/demo.c.o:
+	$(MAKE) -f CMakeFiles/madame_y.dir/build.make CMakeFiles/madame_y.dir/src/demo.c.o
+.PHONY : src/demo.c.o
 
-src/beurette.i: src/beurette.c.i
+src/demo.i: src/demo.c.i
 
-.PHONY : src/beurette.i
+.PHONY : src/demo.i
 
 # target to preprocess a source file
-src/beurette.c.i:
-	$(MAKE) -f CMakeFiles/madame_y.dir/build.make CMakeFiles/madame_y.dir/src/beurette.c.i
-.PHONY : src/beurette.c.i
+src/demo.c.i:
+	$(MAKE) -f CMakeFiles/madame_y.dir/build.make CMakeFiles/madame_y.dir/src/demo.c.i
+.PHONY : src/demo.c.i
 
-src/beurette.s: src/beurette.c.s
+src/demo.s: src/demo.c.s
 
-.PHONY : src/beurette.s
+.PHONY : src/demo.s
 
 # target to generate assembly for a file
-src/beurette.c.s:
-	$(MAKE) -f CMakeFiles/madame_y.dir/build.make CMakeFiles/madame_y.dir/src/beurette.c.s
-.PHONY : src/beurette.c.s
+src/demo.c.s:
+	$(MAKE) -f CMakeFiles/madame_y.dir/build.make CMakeFiles/madame_y.dir/src/demo.c.s
+.PHONY : src/demo.c.s
 
 src/sdl2.o: src/sdl2.c.o
 
@@ -186,9 +186,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... madame_y"
-	@echo "... src/beurette.o"
-	@echo "... src/beurette.i"
-	@echo "... src/beurette.s"
+	@echo "... src/demo.o"
+	@echo "... src/demo.i"
+	@echo "... src/demo.s"
 	@echo "... src/sdl2.o"
 	@echo "... src/sdl2.i"
 	@echo "... src/sdl2.s"
