@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef CPCT_RELOCATABLE_AREA
-CPCT_ABSOLUTE_LOCATION_AREA(0x4000);
+#ifdef CPC_PLATFORM
+#include <cpctelera.h>
 #endif
+
 
 #define WEDGE_TYPE_NEAR_LEFT 4
 #define WEDGE_TYPE_NEAR_RIGHT 8
@@ -130,14 +131,14 @@ const int8_t map[32][32] = {
         {0, 1, 1, 2, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 2, 1, 2, 2, 8, 7, 0, 7, 7, 7, 9, 2, 1, 0},
         {0, 0, 1, 2, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 2, 1, 2, 2, 2, 7, 0, 7, 8, 2, 2, 2, 1, 0},
         {0, 0, 1, 2, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 2, 1, 2, 2, 2, 7, 0, 7, 2, 2, 1, 1, 1, 0},
-        {0, 0, 1, 2, 7, 0, 0, 7, 7, 7, 7, 0, 0, 0, 0, 0, 0, 7, 2, 1, 2, 2, 2, 7, 0, 7, 2, 2, 1, 0, 0, 0},
-        {0, 0, 1, 2, 7, 0, 0, 7, 4, 5, 7, 7, 7, 7, 7, 7, 7, 7, 9, 1, 2, 2, 9, 7, 7, 7, 9, 2, 1, 0, 0, 0},
+        {0, 0, 1, 2, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 2, 1, 2, 2, 2, 7, 0, 7, 2, 2, 1, 0, 0, 0},
+        {0, 0, 1, 2, 7, 0, 0, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 1, 2, 2, 9, 7, 7, 7, 9, 2, 1, 0, 0, 0},
         {0, 0, 1, 2, 7, 0, 0, 7, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 7, 7, 7, 8, 2, 2, 1, 0, 0, 0},
         {0, 0, 1, 2, 7, 0, 0, 7, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 7, 0, 7, 2, 2, 1, 1, 0, 0, 0},
-        {0, 1, 1, 2, 7, 0, 0, 7, 9, 2, 2, 2, 9, 7, 0, 0, 7, 7, 3, 1, 2, 9, 7, 0, 7, 2, 1, 1, 0, 0, 0, 0},
-        {0, 1, 2, 2, 7, 0, 0, 7, 7, 7, 7, 7, 7, 7, 0, 0, 0, 7, 7, 7, 7, 7, 7, 0, 7, 2, 2, 1, 0, 0, 0, 0},
-        {0, 1, 2, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 0, 0, 0, 7, 7, 7, 7, 7, 7, 7, 7, 9, 2, 1, 0, 0, 0, 0},
-        {0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 7, 0, 0, 0, 7, 8, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0, 0, 0},
+        {0, 1, 1, 2, 7, 0, 0, 7, 2, 2, 2, 2, 9, 7, 0, 0, 7, 7, 3, 1, 2, 9, 7, 0, 7, 2, 1, 1, 0, 0, 0, 0},
+        {0, 1, 2, 2, 7, 0, 0, 7, 2, 7, 7, 7, 7, 7, 0, 0, 0, 7, 7, 7, 7, 7, 7, 0, 7, 2, 2, 1, 0, 0, 0, 0},
+        {0, 1, 2, 9, 7, 7, 7, 7, 2, 7, 7, 7, 7, 7, 0, 0, 0, 7, 7, 7, 7, 7, 7, 7, 7, 9, 2, 1, 0, 0, 0, 0},
+        {0, 1, 2, 2, 2, 2, 2, 2, 9, 2, 2, 2, 8, 7, 0, 0, 0, 7, 8, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0, 0, 0},
         {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 7, 0, 0, 7, 7, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 7, 7, 7, 7, 8, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -640,14 +641,23 @@ void renderScene() {
             int8_t limit = max(cameraZ - 19, 0);
             for (int8_t y = min(cameraZ - 3, 31); y >= limit; --y) {
                 int8_t x;
-                int8_t minX = min(cameraX + 5 + ((cameraZ - 3) - y), 31);
+                int8_t *mapY = map[y];
+                int8_t *mapXY;
+                int8_t minX = cameraX + 5 + ((cameraZ - 3) - y);
                 int8_t maxX = 0;
+
+                if (minX > 31) {
+                    minX = 31;
+                }
+
                 lastIndex = cameraX;
-                lastPattern = map[y][lastIndex];
+                lastPattern = *(mapY + lastIndex);
+
+                mapXY = &map[y][lastIndex];
                 for (x = lastIndex; x < minX - 1; ++x) {
                     uint8_t pattern;
 
-                    pattern = map[y][x];
+                    pattern = *mapXY;
 
                     if (pattern != lastPattern) {
                         if (lastPattern != 0) {
@@ -658,17 +668,27 @@ void renderScene() {
                         }
                         lastPattern = pattern;
                     }
+
+                    ++mapXY;
                 }
                 if (lastPattern != 0) {
                     drawPattern(lastPattern, lastIndex - cameraX, x - cameraX, cameraZ - y);
                 }
 
-                lastIndex = max(cameraX - 1, 0);
-                lastPattern = map[y][lastIndex];
+                lastIndex = cameraX - 1;
+                if (lastIndex < 0) {
+                    lastIndex = 0;
+                }
+
+                lastPattern = *(mapY + lastIndex);
+
+                mapXY = &map[y][lastIndex];
+
                 maxX = max(cameraX - 3 - ((cameraZ - 3) - y), 0);
+
                 for (x = lastIndex; x >= maxX + 1; --x) {
                     uint8_t pattern;
-                    pattern = map[y][x];
+                    pattern = *mapXY;
 
                     if (pattern != lastPattern) {
                         if (lastPattern != 0) {
@@ -681,6 +701,8 @@ void renderScene() {
                         }
                         lastPattern = pattern;
                     }
+
+                    --mapXY;
                 }
                 if (lastPattern != 0) {
                     drawPattern(lastPattern, x + 1 - cameraX, lastIndex + 1 - cameraX, cameraZ - y);
@@ -738,94 +760,101 @@ void renderScene() {
     }
 }
 
+#ifdef CPCTELERA_ALL_H
+uint8_t __at(0x7E00) reserveStack[512];
+#endif
+
 int main(int argc, char **argv) {
-    uint8_t running = 1;
-    uint8_t prevX;
-    uint8_t prevZ;
-    cameraX = 5;
-    cameraZ = 15;
-    cameraRotation = 0;
-    init();
-
-    memset(stencilHigh, 0, 128);
-
-
-    do {
-#ifndef CPCT_RELOCATABLE_AREA
-        clear();
+#ifdef CPCTELERA_ALL_H
+    cpct_setStackLocation(0x7E00);
 #endif
-        renderScene();
+    {
+        uint8_t running = 1;
+        uint8_t prevX;
+        uint8_t prevZ;
+        cameraX = 5;
+        cameraZ = 15;
+        cameraRotation = 0;
+        init();
 
-        vLine(127, 0, 127);
-        vLine(0, 0, 127);
-        hLine(0, 127, 0);
-        hLine(0, 127, 127);
-
-        graphicsFlush();
         memset(stencilHigh, 0, 128);
-#ifdef CPCT_RELOCATABLE_AREA
-        clear();
+
+
+        do {
+#ifndef CPCTELERA_ALL_H
+            clear();
 #endif
+            renderScene();
 
-        prevX = cameraX;
-        prevZ = cameraZ;
+            vLine(127, 0, 127);
+            vLine(0, 0, 127);
+            hLine(0, 127, 0);
+            hLine(0, 127, 127);
 
-        waitkey:
-        switch (getKey()) {
-            case 'q':
-                cameraRotation--;
-                if (cameraRotation < 0) {
-                    cameraRotation = 3;
-                }
-                break;
-            case 'e':
-                cameraRotation = (cameraRotation + 1) & 3;
-                break;
-            case 'l':
-                running = 0;
-                break;
+            graphicsFlush();
+            memset(stencilHigh, 0, 128);
+#ifdef CPCTELERA_ALL_H
+            clear();
+#endif
+            prevX = cameraX;
+            prevZ = cameraZ;
 
-            case 'a':
-                cameraX--;
-                break;
-            case 'd':
-                cameraX++;
-                break;
-            case 's':
-                cameraZ++;
-                break;
-            case 'w':
-                cameraZ--;
-                break;
+            waitkey:
+            switch (getKey()) {
+                case 'q':
+                    cameraRotation--;
+                    if (cameraRotation < 0) {
+                        cameraRotation = 3;
+                    }
+                    break;
+                case 'e':
+                    cameraRotation = (cameraRotation + 1) & 3;
+                    break;
+                case 'l':
+                    running = 0;
+                    break;
+
+                case 'a':
+                    cameraX--;
+                    break;
+                case 'd':
+                    cameraX++;
+                    break;
+                case 's':
+                    cameraZ++;
+                    break;
+                case 'w':
+                    cameraZ--;
+                    break;
 #if !defined(SDLSW) || !defined(AMIGA)
-            default:
-                goto waitkey;
+                default:
+                    goto waitkey;
 #endif
-        }
+            }
 
-        if (cameraZ >= 32) {
-            cameraZ = 31;
-        }
+            if (cameraZ >= 32) {
+                cameraZ = 31;
+            }
 
-        if (cameraX >= 32) {
-            cameraX = 31;
-        }
+            if (cameraX >= 32) {
+                cameraX = 31;
+            }
 
-        if (cameraZ < 0) {
-            cameraZ = 0;
-        }
+            if (cameraZ < 0) {
+                cameraZ = 0;
+            }
 
-        if (cameraX < 0) {
-            cameraX = 0;
-        }
+            if (cameraX < 0) {
+                cameraX = 0;
+            }
 
-        if (patterns[map[cameraZ - 2][cameraX]].ceiling < 2) {
-            cameraX = prevX;
-            cameraZ = prevZ;
-        }
-    } while (running);
+            if (patterns[map[cameraZ - 2][cameraX]].ceiling < 2) {
+                cameraX = prevX;
+                cameraZ = prevZ;
+            }
+        } while (running);
 
-    shutdown();
-
+        shutdown();
+    }
     return 0;
 }
