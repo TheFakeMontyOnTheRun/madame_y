@@ -9,15 +9,11 @@ include_directories( src
 		${SDL2_INCLUDE_DIR}
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDLSW -std=c90 -W -g -pedantic -Wall")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSDLSW -std=c90 -W -ansi -g -pedantic -Wall")
 
 find_package(SDL2 REQUIRED)
 
-add_executable(madame_y
-        src/demo.c
-		src/sdl2.c
-		)
-
+add_executable(madame_y src/demo.c src/sdl2.c)
 
 include(FindPkgConfig)
 
