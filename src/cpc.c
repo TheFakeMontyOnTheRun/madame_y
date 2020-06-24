@@ -8,10 +8,10 @@ uint8_t frame = 0;
 
 #define MOVING_POINTERS
 
-void shutdown() {
+void shutdownGraphics() {
 }
 
-void clear();
+void clearGraphics();
 
 
 void graphicsPut(uint8_t nColumn, uint8_t nLine);
@@ -63,8 +63,8 @@ void init() {
 void graphicsFlush() {
     cpct_waitVSYNC();
 #ifdef MOVING_POINTERS
-    if (frame  ) {
-        cpct_setVideoMemoryPage (cpct_page80);
+    if (frame) {
+        cpct_setVideoMemoryPage(cpct_page80);
         frame = 0;
 
     } else {
@@ -273,14 +273,19 @@ inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
     *pS = nByte;
 }
 
-void clear() {
+void clearGraphics() {
     memset((frame) ? 0x8000 : 0xC000, 0, 16 * 1024);
 }
 
 
 //just to ensure nothing will leak into the back buffer
-uint8_t __at(0x8000) reserve[16 * 1024];
-uint8_t __at(0xC000) reserve2[ 16 * 1024];
+uint8_t __at(
+
+0x8000) reserve[16 * 1024];
+
+uint8_t __at(
+
+0xC000) reserve2[ 16 * 1024];
 #ifdef MOVING_POINTERS
 
 #endif

@@ -116,12 +116,12 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 }
 
 
-void shutdown() {
+void shutdownGraphics() {
     SDL_Quit();
 }
 
 
-void clear() {
+void clearGraphics() {
     memset(framebuffer, 0, 160 * 200);
 }
 

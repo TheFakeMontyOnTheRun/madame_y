@@ -20,13 +20,14 @@ enum DIRECTION {
 
 #define IN_RANGE(V0, V1, V)  ((V0) <= (V) && (V) <= (V1))
 
-void shutdown();
+
+void shutdownGraphics();
+
+void clearGraphics();
 
 void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg);
 
 void graphicsPut(uint8_t x, uint8_t y);
-
-void clear();
 
 uint8_t getKey();
 
@@ -45,6 +46,7 @@ int8_t stencilHigh[128];
 int8_t cameraX = 33;
 int8_t cameraZ = 22;
 int8_t cameraRotation = 0;
+uint8_t running = 1;
 
 struct Projection {
     uint8_t px;
@@ -54,7 +56,7 @@ struct Projection {
 
 
 struct Pattern {
-    int8_t ceiling : 4;
+    int8_t ceiling: 4;
     uint8_t elementsMask: 4;
     uint8_t geometryType;
     uint8_t block;
@@ -764,14 +766,131 @@ void renderScene() {
 uint8_t __at(0x7E00) reserveStack[512];
 #endif
 
+
+void tickRenderer() {
+    uint8_t prevX;
+    uint8_t prevZ;
+
+#ifndef CPCTELERA_ALL_H
+    clearGraphics();
+#endif
+    renderScene();
+
+    vLine(127, 0, 127);
+    vLine(0, 0, 127);
+    hLine(0, 127, 0);
+    hLine(0, 127, 127);
+
+    graphicsFlush();
+    memset(stencilHigh, 0, 128);
+#ifdef CPCTELERA_ALL_H
+    clear();
+#endif
+    prevX = cameraX;
+    prevZ = cameraZ;
+
+    waitkey:
+    switch (getKey()) {
+        case 'q':
+            cameraRotation--;
+            if (cameraRotation < 0) {
+                cameraRotation = 3;
+            }
+            break;
+        case 'e':
+            cameraRotation = (cameraRotation + 1) & 3;
+            break;
+        case 'l':
+            running = 0;
+            break;
+
+        case 'a':
+            cameraX--;
+            break;
+        case 'd':
+            cameraX++;
+            break;
+
+
+        case 's':
+            switch (cameraRotation) {
+                case 0:
+                    cameraZ++;
+                    break;
+                case 1:
+                    cameraX--;
+                    break;
+                case 2:
+                    cameraZ--;
+                    break;
+                case 3:
+                    cameraX++;
+                    break;
+            }
+
+
+            break;
+        case 'w':
+            switch (cameraRotation) {
+                case 0:
+                    cameraZ--;
+                    break;
+                case 1:
+                    cameraX++;
+                    break;
+                case 2:
+                    cameraZ++;
+                    break;
+                case 3:
+                    cameraX--;
+                    break;
+            }
+            break;
+
+#ifndef XCODE_BUILD
+#if !defined(SDLSW) || !defined(AMIGA)
+        default:
+            goto waitkey;
+#endif
+#endif
+    }
+
+    if (cameraZ >= 32) {
+        cameraZ = 31;
+    }
+
+    if (cameraX >= 32) {
+        cameraX = 31;
+    }
+
+    if (cameraZ < 0) {
+        cameraZ = 0;
+    }
+
+    if (cameraX < 0) {
+        cameraX = 0;
+    }
+
+    if (patterns[map[cameraZ - 2][cameraX]].ceiling < 2) {
+        cameraX = prevX;
+        cameraZ = prevZ;
+    }
+}
+
+
+#ifdef XCODE_BUILD
+int demoMain() {
+#else
+
 int main(int argc, char **argv) {
+#endif
+
+
 #ifdef CPCTELERA_ALL_H
     cpct_setStackLocation(0x7E00);
 #endif
     {
-        uint8_t running = 1;
-        uint8_t prevX;
-        uint8_t prevZ;
+        running = 1;
         cameraX = 5;
         cameraZ = 15;
         cameraRotation = 0;
@@ -779,82 +898,13 @@ int main(int argc, char **argv) {
 
         memset(stencilHigh, 0, 128);
 
-
+#ifndef XCODE_BUILD
         do {
-#ifndef CPCTELERA_ALL_H
-            clear();
-#endif
-            renderScene();
-
-            vLine(127, 0, 127);
-            vLine(0, 0, 127);
-            hLine(0, 127, 0);
-            hLine(0, 127, 127);
-
-            graphicsFlush();
-            memset(stencilHigh, 0, 128);
-#ifdef CPCTELERA_ALL_H
-            clear();
-#endif
-            prevX = cameraX;
-            prevZ = cameraZ;
-
-            waitkey:
-            switch (getKey()) {
-                case 'q':
-                    cameraRotation--;
-                    if (cameraRotation < 0) {
-                        cameraRotation = 3;
-                    }
-                    break;
-                case 'e':
-                    cameraRotation = (cameraRotation + 1) & 3;
-                    break;
-                case 'l':
-                    running = 0;
-                    break;
-
-                case 'a':
-                    cameraX--;
-                    break;
-                case 'd':
-                    cameraX++;
-                    break;
-                case 's':
-                    cameraZ++;
-                    break;
-                case 'w':
-                    cameraZ--;
-                    break;
-#if !defined(SDLSW) || !defined(AMIGA)
-                default:
-                    goto waitkey;
-#endif
-            }
-
-            if (cameraZ >= 32) {
-                cameraZ = 31;
-            }
-
-            if (cameraX >= 32) {
-                cameraX = 31;
-            }
-
-            if (cameraZ < 0) {
-                cameraZ = 0;
-            }
-
-            if (cameraX < 0) {
-                cameraX = 0;
-            }
-
-            if (patterns[map[cameraZ - 2][cameraX]].ceiling < 2) {
-                cameraX = prevX;
-                cameraZ = prevZ;
-            }
+            tickRenderer();
         } while (running);
 
-        shutdown();
+        shutdownGraphics();
+#endif
     }
     return 0;
 }
