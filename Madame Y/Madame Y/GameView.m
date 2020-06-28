@@ -21,7 +21,7 @@ uint8_t framebuffer[160 * 200];
 
 void tickRenderer();
 void demoMain();
-int32_t stretchedBuffer[ 640 * 480 ];
+int32_t stretchedBuffer[ 160 * 200 ];
 CGColorSpaceRef rgb;
 CGDataProviderRef provider;
 CGImageRef ref;
@@ -140,14 +140,14 @@ void initWindow(id view) {
 
     tickRenderer();
     
-        for ( int y = 0; y < 480; ++y ) {
-            for ( int x = 0; x < 640; ++x ) {
-                int adjustY = y / 2;//((400 * y) / 480);
-                uint8_t index = framebuffer[ (160 * ( adjustY / 2 )) + (x / 4)];
+        for ( int y = 0; y < 200; ++y ) {
+            for ( int x = 0; x < 160; ++x ) {
+                
+                uint8_t index = framebuffer[ (160 * ( y )) + (x)];
                 uint32_t pixel = palette[ index ];
                 uint32_t newPixel;
                 
-#ifndef __BIG_ENDIAN_
+#ifdef __BIG_ENDIAN_
                 newPixel = (((pixel & 0x000000FF) ) << 24) +
                 ((((pixel & 0x0000FF00) >> 8) ) << 16) +
                 ((((pixel & 0x00FF0000) >> 16) ) << 8 );
@@ -159,7 +159,7 @@ void initWindow(id view) {
 #endif
 
             
-                stretchedBuffer[ ( y * 640 ) + x ] = newPixel;
+                stretchedBuffer[ ( y * 160 ) + x ] = newPixel;
         
             }
         }
@@ -168,14 +168,18 @@ void initWindow(id view) {
     
     
         
-    
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
+    CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] CGContext];
+#else
     CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+#endif
+    
+    
     CGContextSaveGState(context);
     
-    provider = CGDataProviderCreateWithData( NULL, &stretchedBuffer[0], 4 * 640 * 480, NULL );
-    ref = CGImageCreate( 640, 480, 8, 32, 4 * 640, rgb, kCGBitmapByteOrder32Host, provider, NULL, 0, kCGRenderingIntentDefault );
-    
-    CGContextDrawImage(context, CGRectMake(0, 0, 640, 480), ref);
+    provider = CGDataProviderCreateWithData( NULL, &stretchedBuffer[0], 4 * 160 * 200, NULL );
+    ref = CGImageCreate( 160, 200, 8, 32, 4 * 160, rgb, kCGBitmapByteOrder32Host, provider, NULL, 0, kCGRenderingIntentDefault );
+    CGContextDrawImage(context, CGRectMake(0, 0, 160, 200), ref);
     CGImageRelease(ref);
     CGDataProviderRelease(provider);
 
@@ -193,8 +197,6 @@ void graphicsPut(uint8_t x, uint8_t y) {
     if (x < 0 || x > 127 || y < 0 || y > 127) {
 
     }
-
-    usleep(100);
 
     framebuffer[(160 * y) + x] = 1;
 }
