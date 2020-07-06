@@ -639,9 +639,9 @@ void renderScene() {
 
     switch (cameraRotation) {
         case DIRECTION_N: {
-
+            int8_t y;
             int8_t limit = max(cameraZ - 19, 0);
-            for (int8_t y = min(cameraZ - 3, 31); y >= limit; --y) {
+            for ( y = min(cameraZ - 3, 31); y >= limit; --y) {
                 int8_t x;
                 int8_t *mapY = map[y];
                 int8_t *mapXY;
@@ -714,8 +714,8 @@ void renderScene() {
             break;
 
         case DIRECTION_E: {
-
-            for (int8_t x = min(cameraX - 3, 31); x <= min(cameraX + 13, 31); ++x) {
+            int8_t x;
+            for ( x = min(cameraX - 3, 31); x <= min(cameraX + 13, 31); ++x) {
                 int8_t y;
 
                 for (y = cameraZ; y <= min(cameraZ + (x - cameraX), 31); ++y) {
@@ -731,8 +731,8 @@ void renderScene() {
             break;
 
         case DIRECTION_S: {
-
-            for (int8_t y = min(cameraZ + 3, 31); y <= min(cameraZ + 19, 31); ++y) {
+            int8_t y;
+            for (y = min(cameraZ + 3, 31); y <= min(cameraZ + 19, 31); ++y) {
                 int8_t x;
                 for (x = cameraX; x <= min(cameraX + (y - (cameraZ + 3)), 31); ++x) {
                     drawPattern(map[y][x], cameraX - x, cameraX - x + 1, y - cameraZ);
@@ -746,8 +746,8 @@ void renderScene() {
             break;
 
         case DIRECTION_W: {
-
-            for (int8_t x = max(cameraX, 0); x >= max(cameraX - 16, 0); --x) {
+            int8_t x;
+            for (x = max(cameraX, 0); x >= max(cameraX - 16, 0); --x) {
                 int8_t y;
                 for (y = cameraZ; y <= min(cameraZ - (x - (cameraX)), 31); ++y) {
                     drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, cameraX - x + 1);
@@ -784,7 +784,7 @@ void tickRenderer() {
     graphicsFlush();
     memset(stencilHigh, 0, 128);
 #ifdef CPCTELERA_ALL_H
-    clear();
+    clearGraphics();
 #endif
     prevX = cameraX;
     prevZ = cameraZ;

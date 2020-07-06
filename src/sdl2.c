@@ -36,7 +36,7 @@ void graphicsPut(uint8_t x, uint8_t y) {
 void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 
     if (x0 == x1) {
-
+        int16_t y;
         int16_t _y0 = y0;
         int16_t _y1 = y1;
 
@@ -46,7 +46,7 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
         }
 
 
-        for (int16_t y = _y0; y <= _y1; ++y) {
+        for ( y = _y0; y <= _y1; ++y) {
             graphicsPut(x0, y);
         }
         return;
@@ -55,13 +55,14 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
     if (y0 == y1) {
         int16_t _x0 = x0;
         int16_t _x1 = x1;
+        int16_t x;
 
         if (x0 > x1) {
             _x0 = x1;
             _x1 = x0;
         }
 
-        for (int16_t x = _x0; x <= _x1; ++x) {
+        for (x = _x0; x <= _x1; ++x) {
             graphicsPut(x, y0);
         }
         return;
