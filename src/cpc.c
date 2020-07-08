@@ -159,6 +159,7 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 }
 
 void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
+
     uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
     unsigned char *pS;
     unsigned char *base;
@@ -168,7 +169,7 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
     uint8_t bytes;
     uint8_t dx = (x1 - x0);
     bytes = dx >> 1;
-    base = ((unsigned char *) pScreen + ((nLine >> 3) * 80) + ((nLine & 7) << 11)) + (x0 >> 1);
+    base = ((unsigned char *) pScreen + ((nLine & 248) * 10) + ((nLine & 7) << 11)) + (x0 >> 1);
 //write whole bytes first, then the remainder with masks
 
     if (x0 & 1) {
@@ -203,9 +204,12 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 }
 
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
+
     uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
+    uint8_t *pointers[8];
 //odd lines
 //even lines
+    uint8_t pointerIndex;
     unsigned char *pS;
     unsigned char *base;
     unsigned char nByte;
@@ -229,8 +233,22 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
         y1 = tmp;
     }
 
+    //pS = ((unsigned char *) base + ((nLine >> 3) * 80) + ((nLine & 7) << 11));
+    pointers[0] = ((unsigned char *) base + (((0) & 248) * 10) + ((0) << 11));
+    pointers[1] = pointers[0] + ((1) << 11);
+    pointers[2] = pointers[0] + ((2) << 11);
+    pointers[3] = pointers[0] + ((3) << 11);
+    pointers[4] = pointers[0] + ((4) << 11);
+    pointers[5] = pointers[0] + ((5) << 11);
+    pointers[6] = pointers[0] + ((6) << 11);
+    pointers[7] = pointers[0] + ((7) << 11);
+
     for (nLine = y0; nLine < y1; nLine++) {
-        pS = ((unsigned char *) base + ((nLine >> 3) * 80) + ((nLine & 7) << 11));
+
+        pointerIndex = nLine & 7;
+
+        pS = pointers[pointerIndex ] + ((nLine & 248) * 10);
+
         nByte = *pS;
         nByte &= mask1;
         nByte |= mask2;
@@ -248,7 +266,7 @@ void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg)
 
     nPixel = nColumn & 1;
 
-    pS = ((unsigned char *) pS + ((nLine >> 3) * 80) + ((nLine & 7) << 11)) + (nColumn >> 1);
+    pS = ((unsigned char *) pS + ((nLine & 248) * 10) + ((nLine & 7) << 11)) + (nColumn >> 1);
 
     cpct_drawStringM0(str, pS);
 }
@@ -259,7 +277,7 @@ inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
     unsigned char *pS;
     unsigned char nByte = 0;
 
-    pS = ((unsigned char *) pScreen + ((nLine >> 3) * 80) + ((nLine & 7) << 11)) + (nColumn >> 1);
+    pS = ((unsigned char *) pScreen + ((nLine & 248 ) * 10) + ((nLine & 7) << 11)) + (nColumn >> 1);
     nByte = *pS;
 
     if (nColumn & 1) {
