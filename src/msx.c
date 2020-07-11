@@ -14,11 +14,10 @@ unsigned char* sbuffer;
 surface_t surf;
 
 void fix_line (uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
- // surface_draw(&surf, x0, y0, x1, y1 );
- line( x0, y0, x1, y1 );
+    surface_draw(&surf, x0, y0, x1, y1 );
 }
 
-void shutdown() {
+void shutdownGraphics() {
   // go back to text mode
   set_mode(mode_0);
 }
@@ -69,12 +68,12 @@ void graphicsPut( uint8_t x, uint8_t y) {
         return;
     }
 
-    pset( x, y );
-    //fix_line( x, y, x, y, 1);
+
+    fix_line( x, y, x, y);
 }
 
-void clear() {
-   set_mode(mode_2);
+void clearGraphics() {
+   memset(sbuffer, 0, MODE2_MAX);
 }
 
 uint8_t getKey() {
@@ -90,6 +89,6 @@ void init() {
 }
 
 void graphicsFlush() {
-  /* msx_vwrite_direct(sbuffer, 0, MODE2_MAX); */
+    msx_vwrite_direct(sbuffer, 0, MODE2_MAX);
 }
 #endif
