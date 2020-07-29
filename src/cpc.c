@@ -260,12 +260,3 @@ inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
 void clearGraphics() {
     memset((frame) ? 0x8000 : 0xC000, 0, 16 * 1024);
 }
-
-
-//just to ensure nothing will leak into the back buffer
-uint8_t __at(0x8000) reserve[16 * 1024];
-
-uint8_t __at(0xC000) reserve2[ 16 * 1024];
-#ifdef MOVING_POINTERS
-
-#endif

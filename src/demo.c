@@ -762,11 +762,6 @@ void renderScene() {
     }
 }
 
-#ifdef CPCTELERA_ALL_H
-uint8_t __at(0x7E00) reserveStack[512];
-#endif
-
-
 void tickRenderer() {
     uint8_t prevX;
     uint8_t prevZ;
@@ -887,7 +882,7 @@ int main(int argc, char **argv) {
 
 
 #ifdef CPCTELERA_ALL_H
-    cpct_setStackLocation(0x7E00);
+    cpct_setStackLocation(0x8000);
 #endif
     {
         running = 1;
