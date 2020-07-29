@@ -21,22 +21,22 @@ void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg)
 uint8_t getKey() {
 
     cpct_scanKeyboard_f();
-    if (cpct_isKeyPressed(Key_Q))
+    if (cpct_isKeyPressed(Key_CursorLeft) || cpct_isKeyPressed(Key_Q))
         return 'q';
 
-    if (cpct_isKeyPressed(Key_E))
+    if (cpct_isKeyPressed(Key_CursorRight) || cpct_isKeyPressed(Key_E))
         return 'e';
 
-    if (cpct_isKeyPressed(Key_W))
+    if (cpct_isKeyPressed(Key_CursorUp) || cpct_isKeyPressed(Key_W))
         return 'w';
 
-    if (cpct_isKeyPressed(Key_S))
+    if (cpct_isKeyPressed(Key_CursorDown) || cpct_isKeyPressed(Key_S))
         return 's';
 
-    if (cpct_isKeyPressed(Key_D))
+    if (cpct_isKeyPressed(Key_P) || cpct_isKeyPressed(Key_D))
         return 'd';
 
-    if (cpct_isKeyPressed(Key_A))
+    if (cpct_isKeyPressed(Key_O) || cpct_isKeyPressed(Key_A))
         return 'a';
 
 
