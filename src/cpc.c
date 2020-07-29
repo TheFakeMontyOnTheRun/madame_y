@@ -206,24 +206,9 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 
     uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
-    uint8_t *pointers[8];
-//odd lines
-//even lines
-    uint8_t pointerIndex;
+
     unsigned char *pS;
     unsigned char *base;
-    unsigned char nByte;
-    uint8_t nLine = 0;
-    uint8_t mask1 = 0;
-    uint8_t mask2 = 0;
-
-    if (x0 & 1) {
-        mask1 = 170;
-        mask2 = 64;
-    } else {
-        mask1 = 85;
-        mask2 = 128;
-    }
 
     base = pScreen + (x0 >> 1);
 
@@ -233,27 +218,8 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
         y1 = tmp;
     }
 
-    //pS = ((unsigned char *) base + ((nLine >> 3) * 80) + ((nLine & 7) << 11));
-    pointers[0] = ((unsigned char *) base + (((0) & 248) * 10) + ((0) << 11));
-    pointers[1] = pointers[0] + ((1) << 11);
-    pointers[2] = pointers[0] + ((2) << 11);
-    pointers[3] = pointers[0] + ((3) << 11);
-    pointers[4] = pointers[0] + ((4) << 11);
-    pointers[5] = pointers[0] + ((5) << 11);
-    pointers[6] = pointers[0] + ((6) << 11);
-    pointers[7] = pointers[0] + ((7) << 11);
-
-    for (nLine = y0; nLine < y1; nLine++) {
-
-        pointerIndex = nLine & 7;
-
-        pS = pointers[pointerIndex ] + ((nLine & 248) * 10);
-
-        nByte = *pS;
-        nByte &= mask1;
-        nByte |= mask2;
-        *pS = nByte;
-    }
+    pS = ((unsigned char *) base + ((y0 >> 3) * 80) + ((y0 & 7) << 11));
+    cpct_drawSolidBox(pS, 1, 1, y1 - y0);
 }
 
 void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg) {
@@ -297,13 +263,9 @@ void clearGraphics() {
 
 
 //just to ensure nothing will leak into the back buffer
-uint8_t __at(
+uint8_t __at(0x8000) reserve[16 * 1024];
 
-0x8000) reserve[16 * 1024];
-
-uint8_t __at(
-
-0xC000) reserve2[ 16 * 1024];
+uint8_t __at(0xC000) reserve2[ 16 * 1024];
 #ifdef MOVING_POINTERS
 
 #endif
