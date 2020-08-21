@@ -413,7 +413,7 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
     z0py = (projections[z0].py);
 
     py0z0 = z0py + ((y0) * z0dx);
-    py1z0 = py0z0 + (dY * z0dx);
+
     py0z1 = z1py + ((y0) * z1dx);
 
     if (px1z0 < 0 || px0z0 > 127) {
@@ -635,131 +635,13 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 }
 
 void renderScene() {
-    uint8_t lastPattern, lastIndex;
+    drawCubeAt(  -1 + cameraX, -1,   2 + cameraZ, 2, 4, 4, 3);
+    drawCubeAt(  -2 + cameraX,  0,   2 + cameraZ, 3, 3, 4, 3);
+    drawCubeAt(   2 + cameraX,  1,   2 + cameraZ, 2, 2, 4, 3);
 
-    switch (cameraRotation) {
-        case DIRECTION_N: {
-            int8_t y;
-            int8_t limit = max(cameraZ - 19, 0);
-            for ( y = min(cameraZ - 3, 31); y >= limit; --y) {
-                int8_t x;
-                int8_t *mapY = map[y];
-                int8_t *mapXY;
-                int8_t minX = cameraX + 5 + ((cameraZ - 3) - y);
-                int8_t maxX = 0;
-
-                if (minX > 31) {
-                    minX = 31;
-                }
-
-                lastIndex = cameraX;
-                lastPattern = *(mapY + lastIndex);
-
-                mapXY = &map[y][lastIndex];
-                for (x = lastIndex; x < minX - 1; ++x) {
-                    uint8_t pattern;
-
-                    pattern = *mapXY;
-
-                    if (pattern != lastPattern) {
-                        if (lastPattern != 0) {
-                            if (!drawPattern(lastPattern, lastIndex - cameraX, x - cameraX, cameraZ - y)) {
-                                x = minX - 1;
-                            }
-                            lastIndex = x;
-                        }
-                        lastPattern = pattern;
-                    }
-
-                    ++mapXY;
-                }
-                if (lastPattern != 0) {
-                    drawPattern(lastPattern, lastIndex - cameraX, x - cameraX, cameraZ - y);
-                }
-
-                lastIndex = cameraX - 1;
-                if (lastIndex < 0) {
-                    lastIndex = 0;
-                }
-
-                lastPattern = *(mapY + lastIndex);
-
-                mapXY = &map[y][lastIndex];
-
-                maxX = max(cameraX - 3 - ((cameraZ - 3) - y), 0);
-
-                for (x = lastIndex; x >= maxX + 1; --x) {
-                    uint8_t pattern;
-                    pattern = *mapXY;
-
-                    if (pattern != lastPattern) {
-                        if (lastPattern != 0) {
-
-                            if (!drawPattern(lastPattern, x + 1 - cameraX, lastIndex + 1 - cameraX, cameraZ - y)) {
-                                x = maxX + 1;
-                            }
-
-                            lastIndex = x;
-                        }
-                        lastPattern = pattern;
-                    }
-
-                    --mapXY;
-                }
-                if (lastPattern != 0) {
-                    drawPattern(lastPattern, x + 1 - cameraX, lastIndex + 1 - cameraX, cameraZ - y);
-                }
-            }
-        }
-            break;
-
-        case DIRECTION_E: {
-            int8_t x;
-            for ( x = min(cameraX - 3, 31); x <= min(cameraX + 13, 31); ++x) {
-                int8_t y;
-
-                for (y = cameraZ; y <= min(cameraZ + (x - cameraX), 31); ++y) {
-                    drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, x - cameraX + 3);
-                }
-
-                for (y = max(cameraZ - 1, 0); y >= max(cameraZ - (x - cameraX), 0); --y) {
-                    drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, x - cameraX + 3);
-                }
-
-            }
-        }
-            break;
-
-        case DIRECTION_S: {
-            int8_t y;
-            for (y = min(cameraZ + 3, 31); y <= min(cameraZ + 19, 31); ++y) {
-                int8_t x;
-                for (x = cameraX; x <= min(cameraX + (y - (cameraZ + 3)), 31); ++x) {
-                    drawPattern(map[y][x], cameraX - x, cameraX - x + 1, y - cameraZ);
-                }
-
-                for (x = max(cameraX - 1, 0); x >= max(cameraX - (y - (cameraZ + 3)), 0); --x) {
-                    drawPattern(map[y][x], cameraX - x, cameraX - x + 1, y - cameraZ);
-                }
-            }
-        }
-            break;
-
-        case DIRECTION_W: {
-            int8_t x;
-            for (x = max(cameraX, 0); x >= max(cameraX - 16, 0); --x) {
-                int8_t y;
-                for (y = cameraZ; y <= min(cameraZ - (x - (cameraX)), 31); ++y) {
-                    drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, cameraX - x + 1);
-                }
-
-                for (y = max(cameraZ - 1, 0); y >= max(cameraZ + (x - (cameraX)), 0); --y) {
-                    drawPattern(map[y][x], y - cameraZ + 3, y + 1 - cameraZ + 3, cameraX - x + 1);
-                }
-            }
-        }
-            break;
-    }
+    drawCubeAt( -11 + cameraX, -2, -10 + cameraZ,  1, 5, 10, 3);
+    drawCubeAt( -10 + cameraX, -2, 0 + cameraZ, 20, 5,  1, 3);
+    drawCubeAt(  10 + cameraX, -2, -10 + cameraZ,  10, 5, 10, 3);
 }
 
 void tickRenderer() {
@@ -850,26 +732,26 @@ void tickRenderer() {
 #endif
     }
 
-    if (cameraZ >= 32) {
-        cameraZ = 31;
-    }
-
-    if (cameraX >= 32) {
-        cameraX = 31;
-    }
-
-    if (cameraZ < 0) {
-        cameraZ = 0;
-    }
-
-    if (cameraX < 0) {
-        cameraX = 0;
-    }
-
-    if (patterns[map[cameraZ - 2][cameraX]].ceiling < 2) {
-        cameraX = prevX;
-        cameraZ = prevZ;
-    }
+//    if (cameraZ >= 32) {
+//        cameraZ = 31;
+//    }
+//
+//    if (cameraX >= 32) {
+//        cameraX = 31;
+//    }
+//
+//    if (cameraZ < 0) {
+//        cameraZ = 0;
+//    }
+//
+//    if (cameraX < 0) {
+//        cameraX = 0;
+//    }
+//
+//    if (patterns[map[cameraZ - 2][cameraX]].ceiling < 2) {
+//        cameraX = prevX;
+//        cameraZ = prevZ;
+//    }
 }
 
 
