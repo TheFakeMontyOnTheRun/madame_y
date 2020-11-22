@@ -197,7 +197,7 @@ int xlate_key(UWORD rawkey, UWORD qualifier, APTR eventptr) {
 
 
 
-void shutdown() {
+void shutdownGraphics() {
     ClearPointer(my_window);
     CloseWindow(my_window);
     CloseScreen(screen);
@@ -205,7 +205,7 @@ void shutdown() {
 }
 
 
-void clear() {
+void clearGraphics() {
     memset(framebuffer, 0, 320 * 200);
 }
 

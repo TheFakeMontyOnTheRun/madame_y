@@ -285,12 +285,12 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 }
 
 
-void shutdownGraphics() {
+void shutdownGraphics(void) {
     CGColorSpaceRelease(rgb);
 }
 
 
-void clearGraphics() {
+void clearGraphics(void) {
     memset(framebuffer, 0, 160 * 200);
 }
 
