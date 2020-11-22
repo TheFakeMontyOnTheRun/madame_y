@@ -60,3 +60,9 @@ madame_y.cbp
 zcc_opt.def
 cfg/cdt_manager.mk
 cfg/compression.mk
+demo.rom
+demo_BSS.bin
+demo_DATA.bin
+game.cdt
+game.dsk
+game12k
