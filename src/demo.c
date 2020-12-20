@@ -180,8 +180,6 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
 
     int16_t px1z1;
 
-    uint8_t drawContour;
-
     if (z0 >= 32) {
         return 0;
     }
@@ -242,8 +240,6 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
         return 0;
     }
 
-    drawContour = 1;
-
 #ifdef DEBUG_WIREFRAME
     fix_line( px0z0, py0z0, px1z0, py0z0, 4);
     fix_line( px0z0, py0z0, px0z0, py1z0, 4);
@@ -260,109 +256,80 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
     {
         int16_t x0, x1;
 
-        if (drawContour) {
-            if (elementMask & 2) {
-                if (IN_RANGE(0, 127, px0z0) && stencilHigh[px0z0] < py0z0) {
-                    vLine(px0z0, py0z0, max(py1z0, stencilHigh[px0z0]));
-                }
-            }
 
-            if (elementMask & 1) {
-                if (IN_RANGE(0, 127, px1z1) && py0z1 > stencilHigh[px1z1]) {
-                    vLine(px1z1, py0z1, max(py1z1, stencilHigh[px1z1]));
-                }
+        if (elementMask & 2) {
+            if (IN_RANGE(0, 127, px0z0) && stencilHigh[px0z0] < py0z0) {
+                vLine(px0z0, py0z0, max(py1z0, stencilHigh[px0z0]));
             }
         }
 
-
+        if (elementMask & 1) {
+            if (IN_RANGE(0, 127, px1z1) && py0z1 > stencilHigh[px1z1]) {
+                vLine(px1z1, py0z1, max(py1z1, stencilHigh[px1z1]));
+            }
+        }
+        
 
         /* The upper segment */
         x0 = px0z0;
         x1 = px1z1;
 
         if (x0 != x1) {
-            int16_t y0 = py1z0;
-            int16_t y1 = py1z1;
-            int16_t dx = abs(x1 - x0);
-            int16_t sx = x0 < x1 ? 1 : -1;
-            int16_t dy = -abs(y1 - y0);
-            int16_t sy = y0 < y1 ? 1 : -1;
-            int16_t err = dx + dy;  /* error value e_xy */
-            int16_t e2;
-
-            while ((x0 != x1 || y0 != y1)) {
-
+            int16_t upperY0 = py1z0;
+            int16_t upperY1 = py1z1;
+            int16_t upperDx = abs(x1 - x0);
+            int16_t upperSx = x0 < x1 ? 1 : -1;
+            int16_t upperDy = -abs(upperY1 - upperY0);
+            int16_t upperSy = upperY0 < upperY1 ? 1 : -1;
+            int16_t upperErr = upperDx + upperDy;  /* error value e_xy */
+            int16_t upperErr2;
+            int16_t lowerY0 = py0z0;
+            int16_t lowerY1 = py0z1;
+            int16_t lowerDx = abs(x1 - x0);
+            int16_t lowerSx = x0 < x1 ? 1 : -1;
+            int16_t lowerDy = -abs(lowerY1 - lowerY0);
+            int16_t lowerSy = lowerY0 < lowerY1 ? 1 : -1;
+            int16_t lowerErr = lowerDx + lowerDy;  /* error value e_xy */
+            int16_t lowerErr2;
+            
+            while ((x0 != x1 && (upperY0 != upperY1 || lowerY0 != lowerY1))) {
+                
                 if (IN_RANGE(0, 127, x0)) {
-                    if (stencilHigh[x0] <= y0) {
-                        if (drawContour) {
-                            graphicsPut(x0, y0);
-                        }
+                    if (stencilHigh[x0] <= upperY0) {
+                        graphicsPut(x0, upperY0);
+                    }
+                    
+                    if (stencilHigh[x0] < lowerY0) {
+                        stencilHigh[x0] = lowerY0;
                     }
                 }
-
+                
                 /* loop */
-                e2 = err << 2;
-
-                if (e2 >= dy) {
-                    err += dy; /* e_xy+e_x > 0 */
-                    x0 += sx;
+                upperErr2 = upperErr * 2;
+                
+                if (upperErr2 >= upperDy || lowerErr2 >= lowerDy) {
+                    upperErr += upperDy; /* e_xy+e_x > 0 */
+                    lowerErr += lowerDy; /* e_xy+e_x > 0 */
+                    x0 += lowerSx;
                 }
-
-                if (x0 >= 128) {
-                    goto done_upper_stroke;
-                }
-
-                if (e2 <= dx) {
-                    /* e_xy+e_y < 0 */
-                    err += dx;
-                    y0 += sy;
-                }
-            }
-        }
-
-        done_upper_stroke:
-
-        /* The lower segment */
-        x0 = px0z0;
-        x1 = px1z1;
-
-        if (x0 != x1) {
-            int16_t y0 = py0z0;
-            int16_t y1 = py0z1;
-            int16_t dx = abs(x1 - x0);
-            int16_t sx = x0 < x1 ? 1 : -1;
-            int16_t dy = -abs(y1 - y0);
-            int16_t sy = y0 < y1 ? 1 : -1;
-            int16_t err = dx + dy;  /* error value e_xy */
-            int16_t e2;
-
-            while ((x0 != x1 || y0 != y1)) {
-
-                if (IN_RANGE(0, 127, x0)) {
-                    if (stencilHigh[x0] < y0) {
-                        if (drawContour) {
-                            graphicsPut(x0, y0);
-                        }
-                        stencilHigh[x0] = y0;
-                    }
-                }
-
-                /* loop */
-                e2 = err << 2;
-
-                if (e2 >= dy) {
-                    err += dy; /* e_xy+e_x > 0 */
-                    x0 += sx;
-                }
-
+                
                 if (x0 >= 128) {
                     return 0;
                 }
-
-                if (e2 <= dx) {
+                
+                if (upperErr2 <= upperDx) {
                     /* e_xy+e_y < 0 */
-                    err += dx;
-                    y0 += sy;
+                    upperErr += upperDx;
+                    upperY0 += upperSy;
+                }
+                
+                /* loop */
+                lowerErr2 = lowerErr * 2;
+                
+                if (lowerErr2 <= lowerDx) {
+                    /* e_xy+e_y < 0 */
+                    lowerErr += lowerDx;
+                    lowerY0 += lowerSy;
                 }
             }
         }
@@ -471,7 +438,6 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
             for (x = px0z0; x <= px1z0; ++x) {
                 if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
                     if (drawContour) {
-                        graphicsPut(x, py0z0);
                         graphicsPut(x, stencilHigh[x]);
                     }
                     stencilHigh[x] = py0z0;
@@ -482,7 +448,6 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
             /* Let's just draw the nearer segment */
             for (x = px0z0; x <= px1z0; ++x) {
                 if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
-                    graphicsPut(x, py0z0);
                     graphicsPut(x, stencilHigh[x]);
                 }
             }
@@ -508,7 +473,6 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
                 if (IN_RANGE(0, 127, x0)) {
                     if (stencilHigh[x0] < y0) {
                         if (drawContour) {
-                            graphicsPut(x0, y0);
                             graphicsPut(x0, stencilHigh[x0]);
                         }
                         stencilHigh[x0] = y0;
@@ -555,7 +519,6 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
 
                 if (IN_RANGE(0, 127, x0) && stencilHigh[x0] < y0) {
                     if (drawContour) {
-                        graphicsPut(x0, y0);
                         graphicsPut(x0, stencilHigh[x0]);
                     }
                     stencilHigh[x0] = y0;
@@ -589,7 +552,6 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
             if (drawContour) {
                 for (x = px0z1; x <= px1z1; ++x) {
                     if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
-                        graphicsPut(x, py0z1);
                         stencilHigh[x] = py0z1;
                     }
                 }
@@ -763,6 +725,11 @@ void renderScene() {
             }
         }
             break;
+    }
+
+
+    for (uint8_t x = 0; x < 127; ++x) {
+        graphicsPut( x, stencilHigh[x]);
     }
 }
 
