@@ -5,6 +5,14 @@
 #include <cpctelera.h>
 
 uint8_t frame = 0;
+uint16_t baseScreen =
+#ifndef MOVING_POINTERS
+        0x8000;
+#else
+        0xC000;
+#endif
+
+
 const uint16_t lineStart[127] = {
         0,
         2048,
@@ -190,6 +198,11 @@ void init() {
     frame = 0;
     cpct_setVideoMemoryPage(cpct_page80);
 #endif
+    if (frame) {
+        baseScreen = 0x8000;
+    } else {
+        baseScreen = 0xC000;
+    }
 }
 
 void graphicsFlush() {
@@ -198,12 +211,13 @@ void graphicsFlush() {
     if (frame) {
         cpct_setVideoMemoryPage(cpct_page80);
         frame = 0;
-
+        baseScreen = 0xC000;
     } else {
         cpct_setVideoMemoryPage(cpct_pageC0);
         frame = 1;
-
+        baseScreen = 0x8000;
     }
+
 #else
     memcpy(0xC000, 0x8000, 80 * 200);
 #endif
@@ -292,16 +306,14 @@ void fix_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 
 void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 
-    uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
     unsigned char *pS;
     unsigned char *base;
     uint8_t nLine = y;
     uint8_t nColumn = 0;
-    uint8_t rest;
     uint8_t bytes;
     uint8_t dx = (x1 - x0);
     bytes = dx >> 1;
-    base = ((unsigned char *) pScreen + ((nLine & 248) * 10) + ((nLine & 7) << 11)) + (x0 >> 1);
+    base = (unsigned char *) baseScreen + lineStart[nLine] + (x0 >> 1);
 //write whole bytes first, then the remainder with masks
 
     if (x0 & 1) {
@@ -337,12 +349,10 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 
-    uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
-
     unsigned char *pS;
     unsigned char *base;
 
-    base = pScreen + (x0 >> 1);
+    base = baseScreen + (x0 >> 1);
 
     if (y0 > y1) {
         uint8_t tmp = y0;
@@ -350,32 +360,31 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
         y1 = tmp;
     }
 
-    pS = ((unsigned char *) base + ((y0 >> 3) * 80) + ((y0 & 7) << 11));
+    pS = (unsigned char *) base + lineStart[y0];
     cpct_drawSolidBox(pS, 1, 1, y1 - y0);
 }
 
 void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg) {
-    unsigned char *pS = (uint8_t *) (frame) ? 0x8000 : 0xC000;
     unsigned char nPixel = 0;
+    uint8_t *pS;
 
-    if (nColumn >= 128 || nLine >= 200) {
+    if (nColumn >= 128 || nLine >= 128) {
         return;
     }
 
     nPixel = nColumn & 1;
 
-    pS = ((unsigned char *) pS + ((nLine & 248) * 10) + ((nLine & 7) << 11)) + (nColumn >> 1);
+    pS = (unsigned char *) baseScreen +lineStart[nLine] + (nColumn >> 1);
 
     cpct_drawStringM0(str, pS);
 }
 
 inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
-    uint8_t *pScreen = (uint8_t *) (frame) ? 0x8000 : 0xC000;
 
     unsigned char *pS;
     unsigned char nByte = 0;
 
-    pS = ((unsigned char *) pScreen + ((nLine & 248 ) * 10) + ((nLine & 7) << 11)) + (nColumn >> 1);
+    pS = (unsigned char *) baseScreen + lineStart[nLine] + (nColumn >> 1);
     nByte = *pS;
 
     if (nColumn & 1) {

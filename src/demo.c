@@ -6,8 +6,7 @@
 #ifdef CPC_PLATFORM
 #include <cpctelera.h>
 
-uint8_t getFrame();
-
+extern uint16_t baseScreen;
 extern const uint16_t lineStart[127];
 #endif
 
@@ -606,12 +605,12 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 
 void renderScene() {
     uint8_t lastPattern, lastIndex;
-    uint8_t *baseScreen;
     int8_t *stencilPtr;
     unsigned char *pS;
     unsigned char *lastPS;
     unsigned char nByte;
     uint8_t y;
+    uint8_t lastY;
     
     switch (cameraRotation) {
         case DIRECTION_N: {
@@ -738,44 +737,45 @@ void renderScene() {
     }
     
 #ifdef CPC_PLATFORM
-    baseScreen = (uint8_t *) (getFrame()) ? 0x8000 : 0xC000;
+
     stencilPtr = &stencilHigh[0];
-#endif
+    lastY = 0xFF;
     
-    for (uint8_t x = 0; x < 127; ++x) {
-#ifdef CPC_PLATFORM
+    for (uint8_t x = 0; x < 63; ++x) {
+
         y = *stencilPtr;
         
-        lastPS = (unsigned char *) baseScreen + lineStart[y];
+        if (y != lastY) {
+            lastPS = (unsigned char *) baseScreen + lineStart[y];
+        }
         
-        pS = lastPS + (x >> 1);
+        pS = lastPS + x;
         nByte = *pS;
         
         nByte &= 85;
         nByte |= 128;
         
-        *pS = nByte;
-        
- 
-        ++x;
-        ++stencilPtr;
-        
-        y = *stencilPtr;
-        
-        lastPS = (unsigned char *) baseScreen + lineStart[y];
-        
-        pS = lastPS + (x >> 1);
-        nByte = *pS;
+        lastY = *(++stencilPtr);
+
+        //if the line is the same, there is no need to write, recompute the same address and load the same byte
+        if (y != lastY) {
+            *pS = nByte;
+            lastPS = (unsigned char *) baseScreen + lineStart[lastY];
+            pS = lastPS + x;
+            nByte = *pS;
+        }
         
         nByte &= 170;
         nByte |= 64;
         
         *pS = nByte;
         ++stencilPtr;
-#else
-        graphicsPut( x, stencilHigh[x]);
-#endif
     }
+#else
+    for (uint8_t x = 0; x < 127; ++x) {
+        graphicsPut( x, stencilHigh[x]);
+    }
+#endif
 }
 
 void tickRenderer() {
