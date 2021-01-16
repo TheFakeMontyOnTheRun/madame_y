@@ -294,7 +294,7 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
             int16_t lowerDy = -abs(lowerY1 - lowerY0);
             int16_t lowerSy = lowerY0 < lowerY1 ? 1 : -1;
             int16_t lowerErr = lowerDx + lowerDy;  /* error value e_xy */
-            int16_t lowerErr2;
+            int16_t lowerErr2 = 0;
             
             while ((x0 != x1 && (upperY0 != upperY1 || lowerY0 != lowerY1))) {
                 
