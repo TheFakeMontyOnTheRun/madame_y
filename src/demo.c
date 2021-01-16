@@ -5,6 +5,10 @@
 
 #ifdef CPC_PLATFORM
 #include <cpctelera.h>
+
+uint8_t getFrame();
+
+extern const uint16_t lineStart[127];
 #endif
 
 
@@ -602,7 +606,13 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 
 void renderScene() {
     uint8_t lastPattern, lastIndex;
-
+    uint8_t *baseScreen;
+    int8_t *stencilPtr;
+    unsigned char *pS;
+    unsigned char *lastPS;
+    unsigned char nByte;
+    uint8_t y;
+    
     switch (cameraRotation) {
         case DIRECTION_N: {
             int8_t y;
@@ -726,10 +736,45 @@ void renderScene() {
         }
             break;
     }
-
-
+    
+#ifdef CPC_PLATFORM
+    baseScreen = (uint8_t *) (getFrame()) ? 0x8000 : 0xC000;
+    stencilPtr = &stencilHigh[0];
+#endif
+    
     for (uint8_t x = 0; x < 127; ++x) {
+#ifdef CPC_PLATFORM
+        y = *stencilPtr;
+        
+        lastPS = (unsigned char *) baseScreen + lineStart[y];
+        
+        pS = lastPS + (x >> 1);
+        nByte = *pS;
+        
+        nByte &= 85;
+        nByte |= 128;
+        
+        *pS = nByte;
+        
+ 
+        ++x;
+        ++stencilPtr;
+        
+        y = *stencilPtr;
+        
+        lastPS = (unsigned char *) baseScreen + lineStart[y];
+        
+        pS = lastPS + (x >> 1);
+        nByte = *pS;
+        
+        nByte &= 170;
+        nByte |= 64;
+        
+        *pS = nByte;
+        ++stencilPtr;
+#else
         graphicsPut( x, stencilHigh[x]);
+#endif
     }
 }
 
