@@ -737,7 +737,7 @@ void tickRenderer() {
     uint8_t prevX;
     uint8_t prevZ;
 
-#ifndef CPCTELERA_ALL_H
+#ifndef CPC_PLATFORM
     clearGraphics();
 #endif
     renderScene();
@@ -749,7 +749,7 @@ void tickRenderer() {
 
     graphicsFlush();
     memset(stencilHigh, 0, 128);
-#ifdef CPCTELERA_ALL_H
+#ifdef CPC_PLATFORM
     clearGraphics();
 #endif
     prevX = cameraX;
@@ -852,7 +852,7 @@ int main(int argc, char **argv) {
 #endif
 
 
-#ifdef CPCTELERA_ALL_H
+#ifdef CPC_PLATFORM
     cpct_setStackLocation(0x8000);
 #endif
     {
