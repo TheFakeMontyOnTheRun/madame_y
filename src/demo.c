@@ -891,6 +891,10 @@ void tickRenderer() {
 
 #ifdef XCODE_BUILD
 int demoMain() {
+    
+    for ( int nLine = 0; nLine < 200; ++nLine) {
+        printf("%d,\n", ((nLine & 248) * 10) + ((nLine & 7) << 11));
+    }
 #else
 
 int main(int argc, char **argv) {
