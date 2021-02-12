@@ -909,26 +909,26 @@ void tickRenderer() {
             break;
 
         case 'a':
-            cameraX--;
+            cameraX -= 2;
             break;
         case 'd':
-            cameraX++;
+            cameraX += 2;
             break;
 
 
         case 's':
             switch (cameraRotation) {
                 case 0:
-                    cameraZ++;
+                    cameraZ += 2;
                     break;
                 case 1:
-                    cameraX--;
+                    cameraX -= 2;
                     break;
                 case 2:
-                    cameraZ--;
+                    cameraZ -= 2;
                     break;
                 case 3:
-                    cameraX++;
+                    cameraX += 2;
                     break;
             }
 
@@ -937,16 +937,16 @@ void tickRenderer() {
         case 'w':
             switch (cameraRotation) {
                 case 0:
-                    cameraZ--;
+                    cameraZ -= 2;
                     break;
                 case 1:
-                    cameraX++;
+                    cameraX += 2;
                     break;
                 case 2:
-                    cameraZ++;
+                    cameraZ += 2;
                     break;
                 case 3:
-                    cameraX--;
+                    cameraX -= 2;
                     break;
             }
             break;
