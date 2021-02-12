@@ -424,6 +424,7 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 
     unsigned char *pS;
     unsigned char *base;
+    unsigned char nByte;
 
     base = baseScreen + (x0 >> 1);
 
@@ -433,8 +434,29 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
         y1 = tmp;
     }
 
-    pS = (unsigned char *) base + lineStart[y0];
-    cpct_drawSolidBox(pS, 1, 1, y1 - y0);
+    if (x0 & 1) {
+        for ( uint8_t y = y0; y < y1; ++y ) {
+
+            pS = base + lineStart[y];
+            nByte = *pS;
+
+            nByte &= 170;
+            nByte |= 64;
+
+            *pS = nByte;
+        }
+    } else {
+        for ( uint8_t y = y0; y < y1; ++y ) {
+
+            pS = base + lineStart[y];
+            nByte = *pS;
+
+            nByte &= 85;
+            nByte |= 128;
+
+            *pS = nByte;
+        }
+    }
 }
 
 void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg) {

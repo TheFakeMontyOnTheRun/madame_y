@@ -299,7 +299,28 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
                 
                 if (IN_RANGE(0, 127, x0)) {
                     if (stencilHigh[x0] <= upperY0) {
-                        graphicsPut(x0, upperY0);
+#ifdef CPC_PLATFORM
+                        
+                            
+                        unsigned char *pS;
+                        unsigned char nByte = 0;
+                            
+                        pS = (unsigned char *) baseScreen + lineStart[upperY0] + (x0 >> 1);
+                        nByte = *pS;
+                            
+                        if (x0 & 1) {
+                            nByte &= 170;
+                            nByte |= 64;
+                        } else {
+                            nByte &= 85;
+                            nByte |= 128;
+                        }
+                            
+                        *pS = nByte;
+#else
+                   graphicsPut(x0, upperY0);
+#endif
+                        
                     }
                     
                     if (stencilHigh[x0] < lowerY0) {
@@ -441,7 +462,25 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
             for (x = px0z0; x <= px1z0; ++x) {
                 if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
                     if (drawContour) {
+#ifdef CPC_PLATFORM
+                        unsigned char *pS;
+                        unsigned char nByte = 0;
+                        
+                        pS = (unsigned char *) baseScreen + lineStart[stencilHigh[x]] + (x >> 1);
+                        nByte = *pS;
+                        
+                        if (x & 1) {
+                            nByte &= 170;
+                            nByte |= 64;
+                        } else {
+                            nByte &= 85;
+                            nByte |= 128;
+                        }
+                        
+                        *pS = nByte;
+#else
                         graphicsPut(x, stencilHigh[x]);
+#endif
                     }
                     stencilHigh[x] = py0z0;
                 }
@@ -451,7 +490,25 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
             /* Let's just draw the nearer segment */
             for (x = px0z0; x <= px1z0; ++x) {
                 if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
+#ifdef CPC_PLATFORM
+                    unsigned char *pS;
+                    unsigned char nByte = 0;
+                    
+                    pS = (unsigned char *) baseScreen + lineStart[stencilHigh[x]] + (x >> 1);
+                    nByte = *pS;
+                    
+                    if (x & 1) {
+                        nByte &= 170;
+                        nByte |= 64;
+                    } else {
+                        nByte &= 85;
+                        nByte |= 128;
+                    }
+                    
+                    *pS = nByte;
+#else
                     graphicsPut(x, stencilHigh[x]);
+#endif
                 }
             }
         }
@@ -476,7 +533,25 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
                 if (IN_RANGE(0, 127, x0)) {
                     if (stencilHigh[x0] < y0) {
                         if (drawContour) {
+#ifdef CPC_PLATFORM
+                            unsigned char *pS;
+                            unsigned char nByte = 0;
+                            
+                            pS = (unsigned char *) baseScreen + lineStart[stencilHigh[x0]] + (x0 >> 1);
+                            nByte = *pS;
+                            
+                            if (x0 & 1) {
+                                nByte &= 170;
+                                nByte |= 64;
+                            } else {
+                                nByte &= 85;
+                                nByte |= 128;
+                            }
+                            
+                            *pS = nByte;
+#else
                             graphicsPut(x0, stencilHigh[x0]);
+#endif
                         }
                         stencilHigh[x0] = y0;
                     }
@@ -522,7 +597,25 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
 
                 if (IN_RANGE(0, 127, x0) && stencilHigh[x0] < y0) {
                     if (drawContour) {
+#ifdef CPC_PLATFORM
+                        unsigned char *pS;
+                        unsigned char nByte = 0;
+                        
+                        pS = (unsigned char *) baseScreen + lineStart[stencilHigh[x0]] + (x0 >> 1);
+                        nByte = *pS;
+                        
+                        if (x0 & 1) {
+                            nByte &= 170;
+                            nByte |= 64;
+                        } else {
+                            nByte &= 85;
+                            nByte |= 128;
+                        }
+                        
+                        *pS = nByte;
+#else
                         graphicsPut(x0, stencilHigh[x0]);
+#endif
                     }
                     stencilHigh[x0] = y0;
                 }
