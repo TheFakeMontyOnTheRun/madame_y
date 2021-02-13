@@ -697,22 +697,25 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 }
 
 void renderScene() {
-    uint8_t lastPattern, lastIndex;
+#ifdef CPC_PLATFORM
     int8_t *stencilPtr;
-    unsigned char *pS;
-    unsigned char *lastPS;
+    unsigned char *pS = NULL;
+    unsigned char *lastPS = NULL;
     unsigned char nByte;
     uint8_t y;
     uint8_t lastY;
+#endif
     
+    uint8_t lastPattern, lastIndex;
+
     switch (cameraRotation) {
         case DIRECTION_N: {
             int8_t y;
             int8_t limit = max(cameraZ - 19, 0);
             for (y = min(cameraZ - 3, 31); y >= limit; --y) {
                 int8_t x;
-                int8_t *mapY = map[y];
-                int8_t *mapXY;
+                int8_t const *mapY = &map[y][0];
+                int8_t const *mapXY;
                 int8_t minX = cameraX + 5 + ((cameraZ - 3) - y);
                 int8_t maxX = 0;
 
@@ -746,7 +749,8 @@ void renderScene() {
                 }
 
                 lastIndex = cameraX - 1;
-                if (lastIndex < 0) {
+                
+                if (!cameraX) {
                     lastIndex = 0;
                 }
 
@@ -995,7 +999,7 @@ int main(int argc, char **argv) {
 
 
 #ifdef CPC_PLATFORM
-    cpct_setStackLocation(0x8000);
+    cpct_setStackLocation((uint8_t*)0x8000);
 #endif
     {
         running = 1;

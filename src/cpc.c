@@ -5,7 +5,7 @@
 #include <cpctelera.h>
 
 uint8_t frame = 0;
-uint16_t baseScreen =
+uint8_t* baseScreen =
 #ifndef MOVING_POINTERS
         0x8000;
 #else
@@ -261,8 +261,8 @@ void init() {
 
     cpct_setVideoMode(0);
 
-    cpct_memset_f64(0xC000, 0x0000, 16 * 1024);
-    cpct_memset_f64(0x8000, 0x0000, 16 * 1024);
+    cpct_memset_f64((uint8_t*)0xC000, 0x0000, 16 * 1024);
+    cpct_memset_f64((uint8_t*)0x8000, 0x0000, 16 * 1024);
 
 #ifndef MOVING_POINTERS
     frame = 1;
@@ -272,9 +272,9 @@ void init() {
     cpct_setVideoMemoryPage(cpct_page80);
 #endif
     if (frame) {
-        baseScreen = 0x8000;
+        baseScreen = (uint8_t*)0x8000;
     } else {
-        baseScreen = 0xC000;
+        baseScreen = (uint8_t*)0xC000;
     }
 }
 
@@ -284,11 +284,11 @@ void graphicsFlush() {
     if (frame) {
         cpct_setVideoMemoryPage(cpct_page80);
         frame = 0;
-        baseScreen = 0xC000;
+        baseScreen = (uint8_t*)0xC000;
     } else {
         cpct_setVideoMemoryPage(cpct_pageC0);
         frame = 1;
-        baseScreen = 0x8000;
+        baseScreen = (uint8_t*)0x8000;
     }
 
 #else
@@ -460,7 +460,7 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 }
 
 void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg) {
-    unsigned char nPixel = 0;
+    unsigned char nPixel = fg + bg; /* just to silence the compiler warnings */
     uint8_t *pS;
 
     if (nColumn >= 128 || nLine >= 128) {
@@ -494,5 +494,5 @@ inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
 }
 
 void clearGraphics() {
-    memset((frame) ? 0x8000 : 0xC000, 0, 16 * 1024);
+    memset((frame) ? (uint8_t*)0x8000 : (uint8_t*)0xC000, 0, 16 * 1024);
 }
