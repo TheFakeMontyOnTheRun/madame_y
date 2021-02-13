@@ -59,7 +59,7 @@ struct Projection {
 
 
 struct Pattern {
-    int8_t ceiling: 4;
+    uint8_t ceiling: 4;
     uint8_t elementsMask: 4;
     uint8_t geometryType;
     uint8_t block;
@@ -107,16 +107,16 @@ const struct Projection projections[36] =
         };
 
 const struct Pattern patterns[16] = {
-        {5,  3, 0, 0}, //0
-        {5,  3, 0, 1}, // 1
-        {-1, 0, 0, 0}, // 2
-        {-1, 3, 0, 0}, //3
-        {-1, 3, 4, 0}, //4
-        {-1, 3, 8, 0}, //5
-        {2,  3, 0, 0}, //6
-        {5,  3, 0, 0}, //7
-        {-1, 1, 0, 0}, // 8
-        {-1, 3, 0, 0}, // 9
+        {7, 3, 0, 0}, //0
+        {7, 3, 0, 1}, // 1
+        {0, 0, 0, 0}, // 2
+        {0, 3, 0, 0}, //3
+        {0, 3, 4, 0}, //4
+        {0, 3, 8, 0}, //5
+        {3, 3, 0, 0}, //6
+        {7, 3, 0, 0}, //7
+        {0, 1, 0, 0}, // 8
+        {0, 3, 0, 0}, // 9
 };
 
 const int8_t map[32][32] = {
@@ -675,7 +675,7 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
     }
 
     if (type == 0) {
-        return drawCubeAt(x0, patterns[pattern].ceiling, y, x1 - x0,
+        return drawCubeAt(x0, patterns[pattern].ceiling - 1, y, x1 - x0,
                           diff, 1, patterns[pattern].elementsMask);
 
     } else {
@@ -691,7 +691,7 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 
         }
 
-        return drawWedge(x0, patterns[pattern].ceiling, y, x1 - x0,
+        return drawWedge(x0, patterns[pattern].ceiling - 1, y, x1 - x0,
                          diff, 1, patterns[pattern].elementsMask, type);
     }
 }
