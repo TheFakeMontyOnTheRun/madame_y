@@ -422,22 +422,25 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 
-    unsigned char *pS;
-    unsigned char *base;
-    unsigned char nByte;
+    register uint8_t y;
+    register uint16_t *lineStartPtr;
+    register uint8_t *pS;
+    register uint8_t *base;
+    register uint8_t nByte;
 
     base = baseScreen + (x0 >> 1);
 
     if (y0 > y1) {
-        uint8_t tmp = y0;
-        y0 = y1;
-        y1 = tmp;
+        lineStartPtr = &lineStart[y1];
+        y = y0 - y1;
+    } else {
+        lineStartPtr = &lineStart[y0];
+        y = y1 - y0;
     }
 
     if (x0 & 1) {
-        for ( uint8_t y = y0; y < y1; ++y ) {
-
-            pS = base + lineStart[y];
+        while( y-- ) {
+            pS = base + *lineStartPtr++;
             nByte = *pS;
 
             nByte &= 170;
@@ -446,9 +449,8 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
             *pS = nByte;
         }
     } else {
-        for ( uint8_t y = y0; y < y1; ++y ) {
-
-            pS = base + lineStart[y];
+        while( y-- ) {
+            pS = base + *lineStartPtr++;
             nByte = *pS;
 
             nByte &= 85;
