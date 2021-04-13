@@ -3,11 +3,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define XRES 128
+#define YRES 128
+#define XRESMINUSONE XRES - 1
+#define YRESMINUSONE YRES - 1
+
+
+#define WALKSTEP 2
+#define CAMERA_HEIGHT 2
+#define VISIBILITY_LIMIT 32
+
 #ifdef CPC_PLATFORM
 #include <cpctelera.h>
 
 extern uint16_t baseScreen;
-extern const uint16_t lineStart[127];
+extern const uint16_t lineStart[YRESMINUSONE];
 #endif
 
 
@@ -44,7 +54,7 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y);
 
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1);
 
-int8_t stencilHigh[128];
+int8_t stencilHigh[XRES];
 
 int8_t cameraX = 33;
 int8_t cameraZ = 22;
@@ -65,45 +75,48 @@ struct Pattern {
     uint8_t block;
 };
 
-const struct Projection projections[36] =
+const struct Projection projections[40] =
         {
-                //                                   Z
-                {0,  127, -64}, // 0
-                {0,  127, -64}, // 1
-                {20, 106, -43}, // 2
-                {31, 95,  -32}, // 3
-                {37, 89,  -26}, // 4
-                {42, 84,  -21}, // 5
-                {45, 81,  -18},  // 6
-                {47, 79,  -16},  // 7
-                {49, 77,  -14},  // 8
-                {50, 76,  -13},  // 9
-                {51, 75,  -12},  // 10
-                {52, 74,  -11},  // 11
-                {53, 73,  -10}, // 12
-                {54, 72,  -9}, // 13
-                {54, 71,  -9}, // 14
-                {55, 70,  -8}, // 15
-                {55, 69,  -8}, // 16
-                {56, 68,  -8}, // 17
-                {56, 67,  -7}, // 18
-                {57, 66,  -7}, // 19
-                {57, 65,  -6}, // 20
-                {57, 64,  -6}, // 21
-                {57, 63,  -6},  // 22
-                {58, 62,  -6},  // 23
-                {58, 61,  -5},  // 24
-                {58, 60,  -5},  // 25
-                {58, 59,  -5},  // 26
-                {58, 58,  -5},  // 27
-                {59, 57,  -5}, // 28
-                {59, 56,  -4}, // 29
-                {59, 55,  -4}, // 30
-                {59, 54,  -4}, // 31
-                {59, 53,  -3}, // 32
-                {59, 52,  -3}, // 33
-                {59, 51,  -3}, // 34
-                {59, 50,  -3}, // 35
+            {    0    ,    63    ,    -127    },    //    1
+            {    0    ,    63    ,    -63    },    //    2
+            {    20    ,    63    ,    -42    },    //    3
+            {    31    ,    63    ,    -31    },    //    4
+            {    37    ,    63    ,    -25    },    //    5
+            {    41    ,    63    ,    -21    },    //    6
+            {    44    ,    63    ,    -18    },    //    7
+            {    47    ,    63    ,    -15    },    //    8
+            {    48    ,    63    ,    -14    },    //    9
+            {    50    ,    63    ,    -12    },    //    10
+            {    51    ,    63    ,    -11    },    //    11
+            {    52    ,    63    ,    -10    },    //    12
+            {    53    ,    63    ,    -9    },    //    13
+            {    53    ,    63    ,    -9    },    //    14
+            {    54    ,    63    ,    -8    },    //    15
+            {    55    ,    63    ,    -7    },    //    16
+            {    55    ,    63    ,    -7    },    //    17
+            {    55    ,    63    ,    -7    },    //    18
+            {    56    ,    63    ,    -6    },    //    19
+            {    56    ,    63    ,    -6    },    //    20
+            {    56    ,    63    ,    -6    },    //    21
+            {    57    ,    63    ,    -5    },    //    22
+            {    57    ,    63    ,    -5    },    //    23
+            {    57    ,    63    ,    -5    },    //    24
+            {    57    ,    63    ,    -5    },    //    25
+            {    58    ,    63    ,    -4    },    //    26
+            {    58    ,    63    ,    -4    },    //    27
+            {    58    ,    63    ,    -4    },    //    28
+            {    58    ,    63    ,    -4    },    //    29
+            {    58    ,    63    ,    -4    },    //    30
+            {    58    ,    63    ,    -4    },    //    31
+            {    59    ,    63    ,    -3    },    //    32
+            {    59    ,    63    ,    -3    },    //    33
+            {    59    ,    63    ,    -3    },    //    34
+            {    59    ,    63    ,    -3    },    //    35
+            {    59    ,    63    ,    -3    },    //    36
+            {    59    ,    63    ,    -3    },    //    37
+            {    59    ,    63    ,    -3    },    //    38
+            {    59    ,    63    ,    -3    },    //    39
+            {    59    ,    63    ,    -3    },    //    40
         };
 
 const struct Pattern patterns[16] = {
@@ -239,7 +252,7 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
         py1z1 = z1py + ((y0 + dY) * z1dx);
     }
 
-    if (px1z1 < 0 || px0z0 > 127) {
+    if (px1z1 < 0 || px0z0 > XRESMINUSONE) {
         return 0;
     }
 
@@ -261,13 +274,13 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
 
 
         if (elementMask & 2) {
-            if (IN_RANGE(0, 127, px0z0) && stencilHigh[px0z0] < py0z0) {
+            if (IN_RANGE(0, XRESMINUSONE, px0z0) && stencilHigh[px0z0] < py0z0) {
                 vLine(px0z0, py0z0, max(py1z0, stencilHigh[px0z0]));
             }
         }
 
         if (elementMask & 1) {
-            if (IN_RANGE(0, 127, px1z1) && py0z1 > stencilHigh[px1z1]) {
+            if (IN_RANGE(0, XRESMINUSONE, px1z1) && py0z1 > stencilHigh[px1z1]) {
                 vLine(px1z1, py0z1, max(py1z1, stencilHigh[px1z1]));
             }
         }
@@ -297,7 +310,7 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
             
             while ((x0 != x1 && (upperY0 != upperY1 || lowerY0 != lowerY1))) {
                 
-                if (IN_RANGE(0, 127, x0)) {
+                if (IN_RANGE(0, XRESMINUSONE, x0)) {
                     if (stencilHigh[x0] <= upperY0) {
 #ifdef CPC_PLATFORM
                         
@@ -337,7 +350,7 @@ uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t 
                     x0 += lowerSx;
                 }
                 
-                if (x0 >= 128) {
+                if (x0 >= XRES) {
                     return 0;
                 }
                 
@@ -411,7 +424,7 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
     py1z0 = py0z0 + (dY * z0dx);
     py0z1 = z1py + ((y0) * z1dx);
 
-    if (px1z0 < 0 || px0z0 > 127) {
+    if (px1z0 < 0 || px0z0 > XRESMINUSONE) {
         return 0;
     }
 
@@ -435,21 +448,21 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
 
         if (drawContour) {
             if (elementMask & 2) {
-                if (IN_RANGE(0, 127, px0z0) && stencilHigh[px0z0] < py0z0) {
+                if (IN_RANGE(0, XRESMINUSONE, px0z0) && stencilHigh[px0z0] < py0z0) {
                     vLine(px0z0, py0z0, stencilHigh[px0z0]);
                 }
 
-                if (IN_RANGE(0, 127, px1z0) && stencilHigh[px1z0] < py0z0) {
+                if (IN_RANGE(0, XRESMINUSONE, px1z0) && stencilHigh[px1z0] < py0z0) {
                     vLine(px1z0, py0z0, stencilHigh[px1z0]);
                 }
             }
 
             if (elementMask & 1) {
-                if (IN_RANGE(0, 127, px0z1) && px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
+                if (IN_RANGE(0, XRESMINUSONE, px0z1) && px0z1 < px0z0 && py0z1 > stencilHigh[px0z1]) {
                     vLine(px0z1, py0z1, stencilHigh[px0z1]);
                 }
 
-                if (IN_RANGE(0, 127, px1z1) && px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
+                if (IN_RANGE(0, XRESMINUSONE, px1z1) && px1z1 > px1z0 && py0z1 > stencilHigh[px1z1]) {
                     vLine(px1z1, py0z1, stencilHigh[px1z1]);
                 }
             }
@@ -460,7 +473,7 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
         if (py0z0 > py0z1) {
             /* Ceiling is lower than camera */
             for (x = px0z0; x <= px1z0; ++x) {
-                if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
+                if (IN_RANGE(0, XRESMINUSONE, x) && stencilHigh[x] < py0z0) {
                     if (drawContour) {
 #ifdef CPC_PLATFORM
                         unsigned char *pS;
@@ -489,7 +502,7 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
             /* Ceiling is higher than the camera*/
             /* Let's just draw the nearer segment */
             for (x = px0z0; x <= px1z0; ++x) {
-                if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z0) {
+                if (IN_RANGE(0, XRESMINUSONE, x) && stencilHigh[x] < py0z0) {
 #ifdef CPC_PLATFORM
                     unsigned char *pS;
                     unsigned char nByte = 0;
@@ -530,7 +543,7 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
 
             while ((x0 != x1 || y0 != y1)) {
 
-                if (IN_RANGE(0, 127, x0)) {
+                if (IN_RANGE(0, XRESMINUSONE, x0)) {
                     if (stencilHigh[x0] < y0) {
                         if (drawContour) {
 #ifdef CPC_PLATFORM
@@ -565,7 +578,7 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
                     x0 += sx;
                 }
 
-                if (x0 >= 128) {
+                if (x0 >= XRES) {
                     goto right_stroke;
                 }
 
@@ -595,7 +608,7 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
 
             while ((x0 != x1 || y0 != y1)) {
 
-                if (IN_RANGE(0, 127, x0) && stencilHigh[x0] < y0) {
+                if (IN_RANGE(0, XRESMINUSONE, x0) && stencilHigh[x0] < y0) {
                     if (drawContour) {
 #ifdef CPC_PLATFORM
                         unsigned char *pS;
@@ -628,7 +641,7 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
                     x0 += sx;
                 }
 
-                if (x0 >= 128) {
+                if (x0 >= XRES) {
                     goto final_stroke;
                 }
 
@@ -647,13 +660,13 @@ uint8_t drawCubeAt(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t
 
             if (drawContour) {
                 for (x = px0z1; x <= px1z1; ++x) {
-                    if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
+                    if (IN_RANGE(0, XRESMINUSONE, x) && stencilHigh[x] < py0z1) {
                         stencilHigh[x] = py0z1;
                     }
                 }
             } else {
                 for (x = px0z1; x <= px1z1; ++x) {
-                    if (IN_RANGE(0, 127, x) && stencilHigh[x] < py0z1) {
+                    if (IN_RANGE(0, XRESMINUSONE, x) && stencilHigh[x] < py0z1) {
                         stencilHigh[x] = py0z1;
                     }
                 }
@@ -675,7 +688,7 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
     }
 
     if (type == 0) {
-        return drawCubeAt(x0, patterns[pattern].ceiling - 1, y, x1 - x0,
+        return drawCubeAt(x0, patterns[pattern].ceiling - CAMERA_HEIGHT, y, x1 - x0,
                           diff, 1, patterns[pattern].elementsMask);
 
     } else {
@@ -691,7 +704,7 @@ uint8_t drawPattern(uint8_t pattern, uint8_t x0, uint8_t x1, uint8_t y) {
 
         }
 
-        return drawWedge(x0, patterns[pattern].ceiling - 1, y, x1 - x0,
+        return drawWedge(x0, patterns[pattern].ceiling - CAMERA_HEIGHT, y, x1 - x0,
                          diff, 1, patterns[pattern].elementsMask, type);
     }
 }
@@ -711,7 +724,7 @@ void renderScene() {
     switch (cameraRotation) {
         case DIRECTION_N: {
             int8_t y;
-            int8_t limit = max(cameraZ - 19, 0);
+            int8_t limit = max(cameraZ - VISIBILITY_LIMIT, 0);
             for (y = min(cameraZ - 3, 31); y >= limit; --y) {
                 int8_t x;
                 int8_t const *mapY = &map[y][0];
@@ -838,7 +851,7 @@ void renderScene() {
     stencilPtr = &stencilHigh[0];
     lastY = 0xFF;
     
-    for (uint8_t x = 0; x < 63; ++x) {
+    for (uint8_t x = 0; x < ( (XRES / 2) - 1); ++x) {
 
         y = *stencilPtr;
         
@@ -869,7 +882,7 @@ void renderScene() {
         ++stencilPtr;
     }
 #else
-    for (uint8_t x = 0; x < 127; ++x) {
+    for (uint8_t x = 0; x < XRESMINUSONE; ++x) {
         graphicsPut(x, stencilHigh[x]);
     }
 #endif
@@ -884,13 +897,13 @@ void tickRenderer() {
 #endif
     renderScene();
 
-    vLine(127, 0, 127);
-    vLine(0, 0, 127);
-//    hLine(0, 127, 0);
-//    hLine(0, 127, 127);
+    vLine(XRESMINUSONE, 0, YRESMINUSONE);
+    vLine(0, 0, YRESMINUSONE);
+    hLine(0, XRESMINUSONE, 0);
+    hLine(0, XRESMINUSONE, YRESMINUSONE);
 
     graphicsFlush();
-    memset(stencilHigh, 0, 128);
+    memset(stencilHigh, 0, XRES);
 #ifdef CPC_PLATFORM
     clearGraphics();
 #endif
@@ -913,26 +926,26 @@ void tickRenderer() {
             break;
 
         case 'a':
-            cameraX -= 2;
+            cameraX -= WALKSTEP;
             break;
         case 'd':
-            cameraX += 2;
+            cameraX += WALKSTEP;
             break;
 
 
         case 's':
             switch (cameraRotation) {
                 case 0:
-                    cameraZ += 2;
+                    cameraZ += WALKSTEP;
                     break;
                 case 1:
-                    cameraX -= 2;
+                    cameraX -= WALKSTEP;
                     break;
                 case 2:
-                    cameraZ -= 2;
+                    cameraZ -= WALKSTEP;
                     break;
                 case 3:
-                    cameraX += 2;
+                    cameraX += WALKSTEP;
                     break;
             }
 
@@ -941,16 +954,16 @@ void tickRenderer() {
         case 'w':
             switch (cameraRotation) {
                 case 0:
-                    cameraZ -= 2;
+                    cameraZ -= WALKSTEP;
                     break;
                 case 1:
-                    cameraX += 2;
+                    cameraX += WALKSTEP;
                     break;
                 case 2:
-                    cameraZ += 2;
+                    cameraZ += WALKSTEP;
                     break;
                 case 3:
-                    cameraX -= 2;
+                    cameraX -= WALKSTEP;
                     break;
             }
             break;
@@ -1004,11 +1017,11 @@ int main(int argc, char **argv) {
     {
         running = 1;
         cameraX = 5;
-        cameraZ = 15;
+        cameraZ = 16;
         cameraRotation = 0;
         init();
 
-        memset(stencilHigh, 0, 128);
+        memset(stencilHigh, 0, XRES);
 
 #ifndef XCODE_BUILD
         do {
