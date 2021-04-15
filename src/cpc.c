@@ -252,6 +252,11 @@ uint8_t getKey() {
     if (cpct_isKeyPressed(Key_O) || cpct_isKeyPressed(Key_A))
         return 'a';
 
+    if (cpct_isKeyPressed(Key_L))
+        return 'l';
+
+    if (cpct_isKeyPressed(Key_K))
+        return 'k';
 
     return '.';
 }
