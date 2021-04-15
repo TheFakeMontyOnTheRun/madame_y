@@ -1043,12 +1043,12 @@ void tickRenderer() {
 #ifndef CPC_PLATFORM
     clearGraphics();
 #endif
-    renderScene();
-
     vLine(XRES, 0, YRES);
     vLine(0, 0, YRES);
     hLine(0, XRES, 0);
     hLine(0, XRES, YRES);
+    
+    renderScene();
 
     graphicsFlush();
     memset(stencilHigh, 0, XRES);
