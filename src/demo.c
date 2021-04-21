@@ -66,6 +66,8 @@ int8_t cameraZ = 22;
 int8_t cameraRotation = 0;
 uint8_t running = 1;
 
+uint8_t enteredFrom = 0xFF;
+
 int playerLocation = 0;
 
 struct Projection {
@@ -953,6 +955,25 @@ void renderScene() {
 #endif
 }
 
+void initMap() {
+    int x, y;
+    for (y = 0; y < 32; ++y ) {
+        for (x = 0; x < 32; ++x ) {
+            uint8_t current = maps[playerLocation][y][x];
+            
+            if ((current == 's' && enteredFrom == 0) ||
+                (current == 'w' && enteredFrom == 1) ||
+                (current == 'n' && enteredFrom == 2) ||
+                (current == 'e' && enteredFrom == 3)
+                ) {
+                cameraX = x;
+                cameraZ = y;
+                enteredFrom = 0xFF;
+            }
+        }
+    }
+}
+
 void tickRenderer() {
     uint8_t prevX;
     uint8_t prevZ;
@@ -1061,12 +1082,22 @@ void tickRenderer() {
     if (cameraX < 0) {
         cameraX = 0;
     }
-
+    
     if (patterns[maps[playerLocation][cameraZ - 2][cameraX]].ceiling < 2) {
         cameraX = prevX;
         cameraZ = prevZ;
     }
+    
+
+    if (maps[playerLocation][cameraZ][cameraX] == '0') {
+        enteredFrom = 2;
+        playerLocation++;
+        initMap();
+    }
 }
+
+
+
 
 
 #ifdef XCODE_BUILD
@@ -1076,7 +1107,6 @@ int demoMain() {
         printf("%d,\n", ((nLine & 248) * 10) + ((nLine & 7) << 11));
     }
 #else
-
 int main(int argc, char **argv) {
 #endif
 
@@ -1086,10 +1116,10 @@ int main(int argc, char **argv) {
 #endif
     {
         running = 1;
-        cameraX = 15;
-        cameraZ = 6;
+        enteredFrom = 2;
         cameraRotation = 0;
         init();
+        initMap();
 
         memset(stencilHigh, 0, XRES);
 
