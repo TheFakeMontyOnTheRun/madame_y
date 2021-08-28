@@ -90,16 +90,22 @@ void initWindow(id view) {
 -(void)keyUp:(NSEvent*)event
 {
     switch ([ event keyCode ]) {
+        case 53:
+            exit(0);
+            break;
         case 0: //a
         case 36: //enter
             break;
         case 1: //s
             mBufferedCommand = 's';
             break;
-        case 53: //esc
+        case 12: //esc
             mBufferedCommand = 'q';
             break;
-            
+        case 14: //esc
+            mBufferedCommand = 'e';
+            break;
+
         case 6: //z
             mBufferedCommand = 'z';
             break;
