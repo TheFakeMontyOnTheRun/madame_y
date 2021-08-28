@@ -9,7 +9,7 @@
 
 CC = zcc
 
-CFLAGS = +zx -vn -llib3d -lm -lndos -create-app -DAMALLOC -DMSX -O3 --opt-code-speed=all
+CFLAGS = +zx -vn -llib3d -lm -lndos -create-app -DAMALLOC -DSPECTRUM -O3 --opt-code-speed=all -compiler=sdcc
 
 EXECFILES = $(CFILES:.c=.cas)
 
