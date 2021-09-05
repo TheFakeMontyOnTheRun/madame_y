@@ -1,7 +1,14 @@
-#include <stdint.h>
-#include <stdio.h>
+
+
+#ifndef SMD
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
 #include <string.h>
+#else
+#include <genesis.h>
+#endif
+
 
 #define XRES 64
 #define YRES 128
@@ -130,7 +137,7 @@ const struct Projection projections[40] =
 
 #include "map.h"
 
-
+#ifndef SMD
 int8_t max(int8_t x1, int8_t x2) {
     return x1 > x2 ? x1 : x2;
 }
@@ -138,7 +145,7 @@ int8_t max(int8_t x1, int8_t x2) {
 int8_t min(int8_t x1, int8_t x2) {
     return x1 < x2 ? x1 : x2;
 }
-
+#endif
 
 uint8_t drawWedge(int8_t x0, int8_t y0, int8_t z0, int8_t dX, int8_t dY, int8_t dZ, uint8_t elementMask, uint8_t type) {
 

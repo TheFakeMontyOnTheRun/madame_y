@@ -1,3 +1,4 @@
+#ifndef SMD
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -503,3 +504,4 @@ inline void graphicsPut(uint8_t nColumn, uint8_t nLine) {
 void clearGraphics() {
     memset((frame) ? (uint8_t*)0x8000 : (uint8_t*)0xC000, 0, 16 * 1024);
 }
+#endif
