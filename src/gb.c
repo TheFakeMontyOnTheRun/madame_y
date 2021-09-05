@@ -4,7 +4,9 @@
 #include <gb/gb.h>
 #include <gb/drawing.h>
 
+#define XRES_SCREEN (160 - 1)
 
+#define YRES_SCREEN (144 - 1)
 
 void fix_line (uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 }
@@ -16,16 +18,16 @@ void writeStr(uint8_t nColumn, uint8_t nLine, char *str, uint8_t fg, uint8_t bg)
 
 void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 
-    if (y > 127 ) {
+    if (y > YRES_SCREEN ) {
         return;
     }
 
-    if (x1 > 127 ) {
-        x1 = 127;
+    if (x1 > XRES_SCREEN ) {
+        x1 = XRES_SCREEN;
     }
 
-    if (x0 > 127 ) {
-        x0 = 127;
+    if (x0 > XRES_SCREEN ) {
+        x0 = XRES_SCREEN;
     }
 
 
@@ -34,15 +36,15 @@ void hLine(uint8_t x0, uint8_t x1, uint8_t y) {
 
 void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 
-    if (y1 > 127 ) {
-        y1 = 127;
+    if (y1 > YRES_SCREEN ) {
+        y1 = YRES_SCREEN;
     }
 
-    if (y0 > 127 ) {
-        y0 = 127;
+    if (y0 > YRES_SCREEN ) {
+        y0 = YRES_SCREEN;
     }
 
-    if (x0 > 127 ) {
+    if (x0 > XRES_SCREEN ) {
         return;
     }
 
@@ -50,11 +52,11 @@ void vLine(uint8_t x0, uint8_t y0, uint8_t y1) {
 }
 
 void graphicsPut( uint8_t x, uint8_t y) {
-    if (y > 127 ) {
+    if (y > YRES_SCREEN ) {
         return;
     }
 
-    if (x > 127 ) {
+    if (x > XRES_SCREEN ) {
         return;
     }
 
@@ -63,7 +65,7 @@ void graphicsPut( uint8_t x, uint8_t y) {
 }
 
 void clearGraphics() {
-    box( 0, 0, 127, 127, M_FILL);
+    box( 0, 0, XRES_SCREEN, YRES_SCREEN, M_FILL);
 }
 
 uint8_t getKey() {
