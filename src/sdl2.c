@@ -151,6 +151,10 @@ uint8_t getKey() {
                     break;
 
                 case SDLK_ESCAPE:
+                    SDL_Quit();
+                    exit(0);
+                    break;
+
                 case SDLK_q:
                     mBufferedCommand = 'l';
                     break;
