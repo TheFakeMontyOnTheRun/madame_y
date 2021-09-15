@@ -66,3 +66,6 @@ demo_DATA.bin
 game.cdt
 game.dsk
 game12k
+out.bin
+symbol.txt
+.idea/workspace.xml
