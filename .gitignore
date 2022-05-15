@@ -120,3 +120,6 @@ obj/spectrum.rel
 obj/spectrum.rst
 obj/spectrum.sym
 obj/dsk_files/.folder
+demo.gb
+.idea
+demo_BANK_1F.bin
