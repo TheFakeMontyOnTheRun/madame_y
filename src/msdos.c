@@ -32,7 +32,7 @@ void writeStr(uint8_t nColumn, uint8_t nLine, char *pStr, uint8_t fg, uint8_t bg
         ++pStr;
     }
 }
-gfdgdf
+
 
 void fix_line (uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 
