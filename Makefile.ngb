@@ -1,6 +1,6 @@
 CC = zcc
 
-CFLAGS = +gb -create-app -DGB -O0
+CFLAGS = +gb  -O3 -vn -lndos -create-app -DGB --opt-code-speed=all
 
 all: demo.gb
 

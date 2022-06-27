@@ -1,16 +1,6 @@
-#
-# Examples for MSX 
-#
-# $Id: Makefile $
-#
-
-#include ../../libsrc/Make.config
-
 CC = zcc
 
-CFLAGS = +msx -vn -llib3d -lm -lndos -create-app -DAMALLOC -DMSX -O3 --opt-code-speed=all
-
-EXECFILES = $(CFILES:.c=.cas)
+CFLAGS = +msx  -compiler=sdcc -SO3 -vn -lndos -create-app -DMSX -O3 --opt-code-speed=all
 
 all: demo.rom
 
